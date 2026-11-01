@@ -1,9 +1,18 @@
 import os
 import json
-import threading
+import time
+import html
 import urllib.request
 import urllib.error
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# 優先採用標準時區模組，若環境不支援則以 UTC+8 備援
+try:
+    import zoneinfo
+    TAIPEI_TZ = zoneinfo.ZoneInfo("Asia/Taipei")
+except Exception:
+    TAIPEI_TZ = timezone(timedelta(hours=8))
+
 import streamlit as st
 
 # ----------------- 頁面與品牌配置 -----------------
@@ -75,7 +84,6 @@ st.markdown("""
         line-height: 1.4;
     }
 
-    /* 黃金邏輯橫幅 */
     .logic-banner {
         background: rgba(212, 175, 55, 0.08);
         border: 1px solid rgba(212, 175, 55, 0.28);
@@ -109,7 +117,6 @@ st.markdown("""
         color: #F8E6C8;
     }
 
-    /* 9格預覽條 */
     .grid-bar {
         display: flex;
         flex-wrap: wrap;
@@ -251,7 +258,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 攻略資料庫 (100% 還原兩張教材截圖) -----------------
+# ----------------- 攻略資料庫 -----------------
 OPENING_PATTERNS = {
     "自動依情境匹配最佳句型": "auto",
     "句型①：「有沒有人跟我一樣⋯⋯」＋投票": "有沒有人跟我一樣",
@@ -291,8 +298,8 @@ LIFE_TOPICS_THOUGHTS = {
     "☕ 小確幸": "客人送了一杯超好喝的咖啡，心裡暖呼呼的（你們今天最開心的是什麼？）"
 }
 
-# ----------------- 獲取 API 金鑰 -----------------
-def get_api_key():
+# ----------------- 安全獲取 API 金鑰 -----------------
+def get_api_key() -> str:
     key = None
     try:
         if "GEMINI_API_KEY" in st.secrets:
@@ -304,18 +311,57 @@ def get_api_key():
         if val:
             key = val.strip()
     if key:
-        for ch in [" ", "'", '"', "[", "]"]:
-            key = key.replace(ch, "")
-        return key.strip()
-    return None
+        # 僅去除外部多餘空格與誤包的引號，完整保留 Base64/Key 原生字符
+        return key.strip().strip("'\"")
+    return ""
 
-# ----------------- 內建「Peggy 攻略全精髓引擎」(零延遲秒出保底) -----------------
+# ----------------- 資料結構完整性驗證器 -----------------
+def validate_story_data(data: dict, expected_count: int) -> tuple[bool, str]:
+    if not isinstance(data, dict):
+        return False, "模型回傳格式非 JSON 物件"
+    
+    day_theme = data.get("day_theme")
+    if not isinstance(day_theme, str) or not day_theme.strip():
+        return False, "缺少有效的 day_theme 主軸文字"
+    
+    stories = data.get("stories")
+    if not isinstance(stories, list):
+        return False, "stories 欄位必須為列表"
+    
+    if len(stories) != expected_count:
+        return False, f"限動篇數不符 (預期 {expected_count} 則，實際回傳 {len(stories)} 則)"
+    
+    required_str_fields = [
+        "time_slot", "category", "role_badge", 
+        "hook_copy", "visual_guide", "sticker_suggestion", "highlight_tag"
+    ]
+    
+    for i, s in enumerate(stories, start=1):
+        if not isinstance(s, dict):
+            return False, f"第 {i} 則限動非字典物件"
+        
+        # 嚴格驗證序號連續性
+        raw_num = s.get("story_number")
+        try:
+            if int(raw_num) != i:
+                return False, f"第 {i} 則限動編號不連續 (收到: {raw_num})"
+        except (TypeError, ValueError):
+            return False, f"第 {i} 則限動編號格式錯誤"
+        
+        # 檢查欄位非空字串
+        for field in required_str_fields:
+            val = s.get(field)
+            if not isinstance(val, str) or not val.strip():
+                return False, f"第 {i} 則限動缺少必填欄位或內容為空: {field}"
+                
+    return True, "驗證通過"
+
+# ----------------- 本地保底備援引擎 -----------------
 def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> dict:
     clean_in = user_input.strip().rstrip("。！!？?～~，,.")
     is_odd = (day_idx % 2 == 1)
     v = seed_idx % 3
 
-    # 1. 生活版 (一天 5 篇：早上 / 中午 / 下午 / 晚上 / 睡前)
     if mode == "生活版（一天 5 篇｜先連續發滿 7 天）":
         return {
             "day_theme": f"生活版 Day {day_idx}｜先讓大家喜歡妳的生活，早埋伏筆、晚給答案",
@@ -355,7 +401,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
                     "time_slot": "19:00 晚上",
                     "category": "晚上｜伏筆揭曉",
                     "role_badge": "🌙 生活有連貫：早上埋伏筆，晚上給答案",
-                    "hook_copy": f"來揭曉早上的伏筆啦！因為「{clean_in}」帶來的滿滿好心情，今天把整個空間與新計畫都整理得超完美✨ 你們今天過得充實嗎？",
+                    "hook_copy": f"來揭曉早上的伏筆啦！因為「{clean_in}」帶來的滿滿好心情，今天把整個空間與預約準備都整理妥當✨ 你們今天過得充實嗎？",
                     "visual_guide": "傍晚收工後的質感空間或完成事項的滿意隨手拍",
                     "sticker_suggestion": "表情滑桿：給今天的充實度打幾分💯",
                     "highlight_tag": "免存精選（前後連貫拉高鐵粉黏著度）"
@@ -373,7 +419,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
             ]
         }
 
-    # 2. 賣貨版 / 招商版 (一天 9 篇三明治結構)
+    # 賣貨版 / 招商版
     if mode == "招商版（一天 9 篇｜團隊與事業魅力）":
         cat3 = "團隊日常"
         cat4 = "夥伴反饋"
@@ -387,7 +433,6 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
         cat9 = "關於我" if is_odd else "里程碑"
         hl3, hl4, hl5, hl9 = "產品介紹", "客戶反饋", ("產品介紹" if is_odd else "產品 QA"), cat9
 
-    # 依據 04 第一篇開頭句型 產生第 1 篇文案
     p_key = OPENING_PATTERNS.get(opening_choice, "auto")
     if p_key == "有沒有人跟我一樣" or (p_key == "auto" and v == 0):
         h1 = f"有沒有人跟我一樣，只要遇到「{clean_in}」整個人心情就瞬間變超好？而且今天還準備了一個小驚喜要忙，你們今天早上有沒有發生什麼小確幸？"
@@ -397,78 +442,65 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
         s1 = "表情滑桿：滑動告訴我你們今天的能量值✨"
     elif p_key == "你們猜猜看":
         h1 = f"你們猜猜看！今天因為「{clean_in}」開啟超棒的一天，接下來預約滿檔的我會先忙哪件事？答案下一篇揭曉，你們猜對了嗎？"
-        s1 = "測驗貼紙：猜猜真真今天先做哪件事？（A 準備施作 / B 偷吃甜點）"
+        s1 = "測驗貼紙：猜猜真真今天先做哪件事？（A 準備施作 / B 整理店內小花園）"
     else:
         h1 = f"今天發生一件超暖心的事：{clean_in}🥰 先留個懸念，後面接著講為什麼這件事讓我感動了一整天！你們今天起床第一件事做什麼？"
         s1 = "投票貼紙：想聽後續舉手🙋‍♀️ / 先幫真真按個讚💛"
 
-    # 第 2 篇：延續早上的暖場與伏筆
     h2 = "接續上一篇～帶著滿滿好心情把工作室打理得香香亮亮的✨ 開場先跟你們聊聊天，你們平時最喜歡什麼味道的香氛或飲品？"
 
-    # 第 3 篇：使用產品 / 團隊日常
     if "招商" in mode:
-        h3 = "看暖了來聊點正事✨ 很多姊妹問我們團隊平時怎麼互相支援？看這專注打磨技術的畫面，你們是不是也很嚮往這種一起變強的氛圍？"
-        v3 = "團隊實操教學或工作室專注進修畫面（不發AI滿版圖）"
+        h3 = "看暖了來聊點正事✨ 很多姊妹問我們團隊平時怎麼共同切磋技術？看這專注打磨手法的畫面，你們是不是也喜歡這種一起成長的踏實感？"
+        v3 = "團隊實操練習或專業手法討論紀錄照（字體最多2種）"
+        h4 = "看著夥伴一步一腳印把護膚細節落實好，客人做完也給予肯定～看到大家靠專業贏得自信，你們是不是也想為熱愛的事勇敢一次？"
+        v4 = "夥伴心得分享或日常操作交流對話截圖（隱去隱私個資）"
     else:
-        h3 = "看暖了來看看今天的專業施作現場💆‍♀️ 精華液搭配獨門手技溫柔導入肌底，你們看這水潤光澤感是不是超療癒？你們多久沒幫臉蛋大掃除了？"
-        v3 = "手部專業施作微距或精華液導入真實畫面（底圖太亮先調暗）"
+        h3 = "看暖了來看看今天的專業護膚時光💆‍♀️ 精華液搭配手法溫柔導入肌底，你們看這水潤細緻的質地是不是很舒壓？你們平時都怎麼保養肌膚？"
+        v3 = "手部專業操作微距或精華液質地特寫（自然光線拍攝）"
+        h4 = "剛剛客人護理後摸摸臉頰說感覺很水潤舒服，聽了心裡特別踏實～若你們平時遇到換季乾燥，最希望改善哪個肌膚困擾呢？"
+        v4 = "真實客人反饋截圖或施作後透亮光澤側拍（無真實回饋時請依實況記錄）"
 
-    # 第 4 篇：客戶反饋 / 夥伴反饋
-    if "招商" in mode:
-        h4 = "夥伴剛傳訊跟我說：『跟著真真把基本功練好，這個月回頭客滿滿！』看到大家靠專業贏得底氣，你們是不是也想為自己勇敢一次？"
-        v4 = "夥伴成長回饋對話截圖（重點畫線，字色不超過2種）"
-    else:
-        h4 = "剛剛客人做完深層淨膚照鏡子直呼：『天啊毛孔像會呼吸，素顏就亮得像燈泡！』看到妳們找回自信，你們也想體驗這種透亮水光肌嗎？"
-        v4 = "客人施作前後透亮對比或LINE真實好評截圖（不發產品DM）"
-
-    # 第 5 篇：商品介紹 / 商品 QA (第2互動高點，結合 05 互動鉤子)
     h_type = INTERACTION_HOOKS.get(hook_choice, "幫我選")
     if is_odd:
         if h_type == "留言領乾貨":
-            h5 = f"為什麼做完臉能這麼亮？秘密就在這道深層補水修護流程✨ 我整理了一份《換季養膚避雷懶人包》，你們想不想要？回覆關鍵字【變美】我私訊傳給你們？"
-            s5 = "問答貼紙：輸入【變美】領取獨家養膚乾貨🎁"
+            h5 = "為什麼深層保濕對肌膚這麼關鍵？因為基底水分做足，膚況自然穩定✨ 我整理了一份《日常基礎保養避雷指南》，你們想看嗎？回覆【保養】傳給你們？"
+            s5 = "問答貼紙：輸入【保養】領取實用基礎指南🎁"
         elif h_type == "抽卡":
-            h5 = "今天這組明星修護安瓶太強了✨ 來玩個肌膚抽卡！你們現在最想解決 1暗沉、2粉刺、還是 3乾燥細紋？選 1、2、3 我一個個私訊幫你們解讀？"
-            s5 = "投票/問答貼紙：選 1、2、3 測妳當下最需要的保養解方🃏"
+            h5 = "今天施作這道流程手感特別棒✨ 來玩個膚況小互動！你們現在最想加強 1水分保濕、2日常清潔、還是 3舒緩修護？選 1、2、3 我私訊跟你們交流？"
+            s5 = "投票/問答貼紙：選 1、2、3 聊聊妳當前重視的護理重點🃏"
         else:
-            h5 = "店裡點名率第一名的深層修護就是它👑 溫和代謝老廢角質同時鎖水，完全不挑膚質！你們保養時最在乎 A保濕透亮 還是 B緊緻毛孔？幫我投票選一個？"
-            s5 = "投票貼紙：A 保濕透亮燈泡肌💡 / B 緊緻零毛孔✨"
-        v5 = "明星產品或施作工具質感實拍（字放安全區）"
+            h5 = "店裡很受歡迎的深層溫和護理流程👑 著重在軟化代謝角質並深層補水！你們日常保養時最在乎 A清爽透亮 還是 B潤澤細緻？幫我選一個？"
+            s5 = "投票貼紙：A 清爽透亮✨ / B 潤澤細緻💧"
+        v5 = "護理產品或專業設備乾淨擺拍（文字放安全區）"
     else:
         if h_type == "QA收題日":
-            h5 = "今天是每週保養 QA 收題日✨ 很多客人問外油內乾怎麼救？其實先把基底水補足就對了！先看我精選『產品 QA』，你們最近還有什麼搞不定的肌膚困擾嗎？"
-            s5 = "提問貼紙：把你們的保養困擾丟過來，隔天一題一篇解答💬"
+            h5 = "今天是每週護膚 QA 交流日✨ 常有朋友問外油內乾怎麼保養？關鍵在做好溫和清潔與水分補給！先看我精選『產品 QA』，你們還有哪些保養疑問呢？"
+            s5 = "提問貼紙：留下你們的護膚困擾，隔天一題一篇解答💬"
         else:
-            h5 = "大家最常問：多久做一次臉最剛好？其實順應肌膚 28 天週期最穩定！猜猜看做完臉頭三天最忌諱什麼？你們平時洗臉都用冷水還是溫水？"
-            s5 = "測驗貼紙：做完臉頭三天最該加強什麼？（A 高濃度酸類 / B 純保濕與防曬）"
-        v5 = "真真專業解說側拍或 QA 乾淨排版底圖（字體最多2種）"
+            h5 = "大家常問：護膚多久安排一次比較合適？建議順應肌膚代謝週期穩定調理～猜猜看護膚後頭幾天最重要的是什麼？你們平時洗臉都用溫水還是冷水？"
+            s5 = "測驗貼紙：做完深層護膚後最需注意？（A 加強保濕與防曬 / B 馬上使用去角質）"
+        v5 = "真真專業工作側拍或重點 QA 排版圖（字體顏色最多2種）"
 
-    # 第 6 篇：生活放鬆 (講完工作回到生活)
     h6 = "聊完專業工作，切換回下午的放鬆生活模式🌿 泡杯熱茶喘口氣，你們下午累了都怎麼幫自己充電？會偷吃小點心嗎？"
-
-    # 第 7 篇：生活放鬆 (店內氛圍 / 魚缸 / 工作角落)
     h7 = "在工作室待最久的角落，看著魚缸裡的小魚小蝦悠哉游動真的好解壓🐠 你們待最久的辦公或生活角落長怎樣？也有療癒小物嗎？"
+    h8 = f"來給早上的伏筆答案啦🌙 今天因為「{clean_in}」心情很好，把每位客人都用心服務好，今天的排程也順利完成！你們今天最開心的一件事是什麼？"
 
-    # 第 8 篇：生活放鬆 (晚上給答案！呼應早上的伏筆)
-    h8 = f"來給早上的伏筆答案啦🌙 今天因為「{clean_in}」心情超好，不僅把每位客人都照顧得美美的，連原本卡關的小細節都順利搞定了！你們今天最開心的一件事是什麼？"
-
-    # 第 9 篇：關於我 / 里程碑 (最後一篇給他「為什麼要相信你」)
     if is_odd:
-        h9 = "走過人生起伏才更懂得：女人最好的底氣是獨立與通透👑 在真真美學我堅持不強迫推銷，只給妳們真正有感的專業呵護。你們覺得怎樣才叫活得漂亮？"
-        v9 = "真真知性優雅工作側拍或個人大女主形象照"
+        h9 = "走過生活起伏才懂得：女人最好的底氣是獨立與通透👑 在真真美學我堅持不強迫推銷，只給妳們真正安心的專業呵護。你們覺得怎樣才叫活得漂亮？"
+        v9 = "真真知性優雅工作側拍或個人質感形象照"
         s9 = "表情滑桿：一起成為獨立發光的大女主👑"
     else:
-        h9 = "看著預約表上滿滿的老客人與不斷累積的好口碑，謝謝妳們願意把重要的臉蛋交給我✨ 流量很重要，但我更在乎能帶給你們多少自信！下週想預約的公主準備好了嗎？"
-        v9 = "專業證照、進修紀錄或滿意熟客累積見證牆"
-        s9 = "投票貼紙：想預約本週名額🙋‍♀️ / 先看精選『QA』了解✨"
+        h9 = "看著預約表上熟悉的信任與交流，謝謝妳們願意把臉蛋交給我的專業✨ 流量很重要，但我更在乎帶給你們多少從容與自信！這週想預約的公主準備好了嗎？"
+        v9 = "專業證書、進修日常紀錄或與客人間的溫暖互動照"
+        s9 = "投票貼紙：準備好這週來放鬆護膚✨ / 想先詢問細節🙋‍♀️"
 
     return {
         "day_theme": f"DAY {day_idx}（{'奇數天：商品介紹＋關於我' if is_odd else '偶數天：商品 QA＋里程碑'}）｜早埋伏筆、晚給答案",
         "stories": [
             {"story_number": 1, "time_slot": "09:00", "category": "生活", "role_badge": "🌅 第一篇：看得到你＋一句共鳴＋互動貼紙（早上埋伏筆｜互動高點①）", "hook_copy": h1, "visual_guide": "真真露臉親切微笑或日常晨間第一視角（底圖調暗放安全區）", "sticker_suggestion": s1, "highlight_tag": "免存精選（誰回了這篇就是今天最熱的名單，一定要回！）"},
             {"story_number": 2, "time_slot": "10:30", "category": "生活", "role_badge": "☕ 第二篇：生活暖場延續，講話像閨蜜聊天", "hook_copy": h2, "visual_guide": "工作室晨間光線或飲品隨手拍（字體≤2種、字色≤2種）", "sticker_suggestion": "投票貼紙：咖啡派☕️ / 茶飲派🍵", "highlight_tag": "免存精選（把觀眾看暖了，下一篇準備進工作）"},
-            {"story_number": 3, "time_slot": "12:00", "category": cat3, "role_badge": "💆‍♀️ 第三篇：看暖了再聊工作（專業過程展示）", "hook_copy": h3, "visual_guide": v3, "sticker_suggestion": "表情滑桿：這水潤光澤感給幾分✨", "highlight_tag": f"📌 建議存入精選：【{hl3}】"},
-            {"story_number": 4, "time_slot": "13:30", "category": cat4, "role_badge": "🌟 第四篇：真實見證（讓效果自己說話）", "hook_copy": h4, "visual_guide": v4, "sticker_suggestion": "投票貼紙：我也想要透亮燈泡肌💡 / 想了解私訊我💬", "highlight_tag": f"📌 建議存入精選：【{hl4}】"},
+            {"story_number": 3, "time_slot": "12:00", "category": cat3, "role_badge": "💆‍♀️ 第三篇：看暖了再聊工作（專業過程展示）", "hook_copy": h3, "visual_guide": v3, "sticker_suggestion": "表情滑桿：這細緻質感給幾分✨", "highlight_tag": f"📌 建議存入精選：【{hl3}】"},
+            {"story_number": 4, "time_slot": "13:30", "category": cat4, "role_badge": "🌟 第四篇：真實見證（讓效果自己說話）", "hook_copy": h4, "visual_guide": v4, "sticker_suggestion": "投票貼紙：想了解個人化護膚💡 / 私訊聊聊💬", "highlight_tag": f"📌 建議存入精選：【{hl4}】"},
             {"story_number": 5, "time_slot": "15:00", "category": cat5, "role_badge": f"🔥 第五篇：第二互動高點（隔天輪替：{cat5}｜鉤子：{hook_choice}）", "hook_copy": h5, "visual_guide": v5, "sticker_suggestion": s5, "highlight_tag": f"📌 建議存入精選：【{hl5}】（被問重複問題直接回：我精選有整理先看看～）"},
             {"story_number": 6, "time_slot": "16:30", "category": "生活", "role_badge": "🌿 第六篇：講完工作立刻回到生活（鬆弛感切換）", "hook_copy": h6, "visual_guide": "下午茶點心或隨手拍生活角落（不發AI生成滿版圖）", "sticker_suggestion": "投票貼紙：下午茶續命🍰 / 專注打拼中💪", "highlight_tag": "免存精選（洗掉商業感，維持帳號溫度）"},
             {"story_number": 7, "time_slot": "18:00", "category": "生活", "role_badge": "🐠 第七篇：店內療癒角落（看得到的日常）", "hook_copy": h7, "visual_guide": "魚缸小魚小蝦游動短片或店內香氛綠植特寫", "sticker_suggestion": "表情滑桿：療癒指數滿分💯", "highlight_tag": "免存精選（展現真真美學的舒適空間感）"},
@@ -477,13 +509,29 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
         ]
     }
 
-# ----------------- 混合極速調用函數 (3.8 秒硬上限 + Peggy 全攻略約束) -----------------
-def generate_stories(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> dict:
+# ----------------- 核心調用與診斷整合函式 -----------------
+def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> tuple[dict, dict]:
     api_key = get_api_key()
     fallback_data = peggy_master_engine(mode, day_idx, user_input, opening_choice, hook_choice, seed_idx)
-    if not api_key:
-        return fallback_data
+    
+    execution_log = {
+        "timestamp": datetime.now(TAIPEI_TZ).strftime("%Y-%m-%d %H:%M:%S (台灣標準時間)"),
+        "model": "gemini-3.8-flash",
+        "api_requested": False,
+        "api_success": False,
+        "elapsed_seconds": 0.0,
+        "http_code": None,
+        "error_detail": None,
+        "source": "本地備援引擎",
+        "validation_result": "尚未驗證"
+    }
 
+    if not api_key:
+        execution_log["error_detail"] = "系統未檢測到 GEMINI_API_KEY（請至 Streamlit Secrets 配置）"
+        execution_log["validation_result"] = "本地引擎輸出驗證通過"
+        return fallback_data, execution_log
+
+    execution_log["api_requested"] = True
     is_odd = (day_idx % 2 == 1)
     story_count = 5 if "生活版" in mode else 9
     qa_or_intro = "商品介紹" if is_odd else "商品 QA"
@@ -496,62 +544,88 @@ def generate_stories(mode: str, day_idx: int, user_input: str, opening_choice: s
 指定第二互動高點鉤子：{hook_choice}
 
 【絕對遵守的攻略鐵律】：
-1. 順序與結構（若為9篇）：1生活、2生活、3使用產品、4客戶反饋、5{qa_or_intro}、6生活、7生活、8生活、9{about_or_milestone}。每篇間隔 1.5 小時（09:00~21:00）。
+1. 順序與結構（若為9篇）：1生活、2生活、3使用產品、4客戶反饋、5{qa_or_intro}、6生活、7生活、8生活、9{about_or_milestone}。每篇建議間隔 1.5 小時（09:00~21:00）。
 2. 第一篇必須套用開頭句型（如「有沒有人跟我一樣⋯」「你們會不會也⋯」「你們猜猜看⋯」「今天發生一件⋯的事」），看得到人+一句共鳴+互動貼紙，並在早上埋下日常伏筆。
 3. 講話像聊天：所有 hook_copy 必須把自稱「我」換成跟粉絲對話的「你們」，且結尾必須丟出一個問題（以？結尾）！
 4. 生活有連貫：第 1 篇早上埋伏筆，第 8 篇（或生活版第 4 篇）晚上給答案！
 5. 第二個互動高點：在第 5 篇（或生活版第 3 篇）結合互動鉤子（{hook_choice}）拉高互動。
-6. 精選歸檔標記：第 3、4、5、9 篇標註對應精選（關於我/產品介紹/客戶反饋/產品 QA/里程碑）。
+6. 誠實合規原則：未提供真實反饋時，客戶反饋篇應以詢問困擾或日常真實心得為準，不虛構絕對化行銷宣稱。
+7. 精選歸檔標記：第 3、4、5、9 篇標註對應精選（關於我/產品介紹/客戶反饋/產品 QA/里程碑）。
 
 請輸出純 JSON 格式：
 {{"day_theme":"本日主軸","stories":[{{"story_number":1,"time_slot":"09:00","category":"分類","role_badge":"攻略定位說明","hook_copy":"文案(含你們+問號結尾)","visual_guide":"配圖建議","sticker_suggestion":"互動貼紙","highlight_tag":"精選歸檔提示"}}]}}"""
 
-    result_holder = {}
+    clean_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={api_key}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.7
+        }
+    }
+    
+    req = urllib.request.Request(
+        clean_url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
 
-    def api_worker():
+    start_time = time.time()
+    try:
+        # 給予合理的 15 秒原生 HTTP 逾時時間
+        with urllib.request.urlopen(req, timeout=15.0) as response:
+            execution_log["http_code"] = response.getcode()
+            res_bytes = response.read()
+            res = json.loads(res_bytes.decode("utf-8"))
+            
+            content_text = res["candidates"][0]["content"]["parts"][0]["text"].strip()
+            s_idx = content_text.find("{")
+            e_idx = content_text.rfind("}")
+            if s_idx == -1 or e_idx == -1:
+                raise ValueError("回傳文字中找不到有效 JSON 邊界")
+                
+            parsed = json.loads(content_text[s_idx:e_idx+1])
+            is_valid, val_msg = validate_story_data(parsed, story_count)
+            execution_log["validation_result"] = val_msg
+            
+            if not is_valid:
+                raise ValueError(f"資料結構校驗失敗: {val_msg}")
+
+            execution_log["api_success"] = True
+            execution_log["source"] = "Gemini 3.8 Flash (AI即時生成)"
+            execution_log["elapsed_seconds"] = round(time.time() - start_time, 2)
+            return parsed, execution_log
+
+    except urllib.error.HTTPError as e:
+        execution_log["http_code"] = e.code
+        err_body = ""
         try:
-            clean_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={api_key}"
-            for ch in ["[", "]", "'", '"', " "]:
-                clean_url = clean_url.replace(ch, "")
-            payload = {
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {
-                    "responseMimeType": "application/json",
-                    "temperature": 0.7
-                }
-            }
-            req = urllib.request.Request(
-                clean_url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST"
-            )
-            with urllib.request.urlopen(req, timeout=3.6) as response:
-                res = json.loads(response.read().decode("utf-8"))
-                content_text = res["candidates"][0]["content"]["parts"][0]["text"].strip()
-                s_idx = content_text.find("{")
-                e_idx = content_text.rfind("}")
-                if s_idx != -1 and e_idx != -1:
-                    parsed = json.loads(content_text[s_idx:e_idx+1])
-                    if isinstance(parsed.get("stories"), list) and len(parsed["stories"]) == story_count:
-                        result_holder["data"] = parsed
+            err_body = e.read().decode("utf-8")
         except Exception:
             pass
+            
+        if e.code == 429:
+            execution_log["error_detail"] = f"HTTP 429 (請求頻率受限): 官方連線額度達上限或請求過於頻繁"
+        elif e.code == 503:
+            execution_log["error_detail"] = f"HTTP 503 (伺服器暫時忙碌): Google 模型目前尖峰滿載"
+        elif e.code == 400:
+            execution_log["error_detail"] = f"HTTP 400 (參數錯誤): 請檢查提示詞或設定格式"
+        elif e.code == 403:
+            execution_log["error_detail"] = f"HTTP 403 (權限不足): API Key 無效或未開通權限"
+        else:
+            execution_log["error_detail"] = f"HTTP {e.code} API 錯誤: {err_body[:160]}"
 
-    t = threading.Thread(target=api_worker, daemon=True)
-    t.start()
-    t.join(timeout=3.8)
+    except urllib.error.URLError as e:
+        execution_log["error_detail"] = f"網路連線或逾時異常 (Timeout/URLError): {str(e.reason)}"
+    except json.JSONDecodeError as e:
+        execution_log["error_detail"] = f"JSON 解析失敗: {str(e)}"
+    except Exception as e:
+        execution_log["error_detail"] = f"執行異常 ({type(e).__name__}): {str(e)}"
 
-    if "data" in result_holder:
-        api_data = result_holder["data"]
-        for i, fb_item in enumerate(fallback_data["stories"]):
-            if i < len(api_data.get("stories", [])):
-                st_i = api_data["stories"][i]
-                for k in ["time_slot", "category", "role_badge", "highlight_tag", "visual_guide", "sticker_suggestion"]:
-                    if not st_i.get(k):
-                        st_i[k] = fb_item[k]
-        return api_data
-    return fallback_data
+    execution_log["elapsed_seconds"] = round(time.time() - start_time, 2)
+    execution_log["source"] = "本地備援引擎 (API 調用未成功，自動安全接管)"
+    return fallback_data, execution_log
 
 # ----------------- 介面頂部：奢華 Header -----------------
 st.markdown("""
@@ -567,9 +641,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ----------------- 01 每日發文模板 & 7 天排程表 -----------------
-now = datetime.now()
-today_auto_idx = now.isoweekday()
+# ----------------- 01 每日發文模板 & 7 天排程表 (台灣標準時間) -----------------
+now_taipei = datetime.now(TAIPEI_TZ)
+today_auto_idx = now_taipei.isoweekday()
 day_labels = {
     1: "DAY 1（週一｜奇數天）",
     2: "DAY 2（週二｜偶數天）",
@@ -593,7 +667,7 @@ with c_mode:
     )
 with c_day:
     selected_day_idx = st.selectbox(
-        "📅 七天排程表（自動對應今日）",
+        f"📅 七天排程表（已自動切換台灣時間：{now_taipei.strftime('%m/%d')} 週{['一','二','三','四','五','六','日'][today_auto_idx-1]}）",
         options=[1, 2, 3, 4, 5, 6, 7],
         format_func=lambda x: day_labels[x],
         index=today_auto_idx - 1
@@ -605,7 +679,6 @@ slot9_name = "關於我" if is_odd_day else "里程碑"
 if "招商" in selected_mode:
     slot5_name = "公司介紹" if is_odd_day else "團隊 QA"
 
-# 動態顯示 9 格或 5 格排程膠囊條
 if "生活版" in selected_mode:
     st.markdown("""
     <div class="grid-bar">
@@ -628,12 +701,12 @@ else:
         <span class="grid-pill-work">5 {slot5_name}</span>
         <span class="grid-pill">6 生活</span>
         <span class="grid-pill">7 生活</span>
-        <span class="grid-pill">8 生活(給答案)</span>
+        <span class="grid-pill-work">8 生活(給答案)</span>
         <span class="grid-pill-work">9 {slot9_name}</span>
     </div>
     """, unsafe_allow_html=True)
 
-# ----------------- 06 生活主題發想庫（不知道發什麼？一鍵帶入） -----------------
+# ----------------- 06 生活主題發想庫 -----------------
 if "draft_input" not in st.session_state:
     st.session_state["draft_input"] = ""
 
@@ -674,8 +747,11 @@ user_thought = st.text_area(
 )
 st.session_state["draft_input"] = user_thought
 
+# Session State 持久化
 if "story_plan" not in st.session_state:
     st.session_state["story_plan"] = None
+if "execution_log" not in st.session_state:
+    st.session_state["execution_log"] = None
 if "seed_counter" not in st.session_state:
     st.session_state["seed_counter"] = 0
 
@@ -684,7 +760,7 @@ generate_btn = st.button("✨ 照攻略一鍵排好今日限動腳本（含伏�
 if generate_btn:
     final_input = user_thought.strip() if user_thought.strip() else "今天在工作室準備迎接預約的公主們，心情特別充實美好"
     with st.spinner("👑 軍師正在依《限動一頁式攻略》與《7天模板》排定腳本..."):
-        st.session_state["story_plan"] = generate_stories(
+        plan_res, log_res = generate_stories_service(
             selected_mode,
             selected_day_idx,
             final_input,
@@ -692,34 +768,80 @@ if generate_btn:
             hook_choice,
             st.session_state["seed_counter"]
         )
+        st.session_state["story_plan"] = plan_res
+        st.session_state["execution_log"] = log_res
         st.session_state["seed_counter"] += 1
 
-# ----------------- 渲染產出腳本卡片 -----------------
+# ----------------- 渲染產出腳本卡片 (含 XSS 逃逸保護) -----------------
 plan = st.session_state.get("story_plan")
+log = st.session_state.get("execution_log")
+
 if plan and isinstance(plan, dict):
+    # 顯示來源狀態識別條
+    source_str = log.get("source", "系統生成") if log else "系統生成"
+    is_cloud_ai = "Gemini" in source_str
+    
+    badge_bg = "rgba(46, 125, 50, 0.2)" if is_cloud_ai else "rgba(212, 175, 55, 0.2)"
+    badge_border = "#4CAF50" if is_cloud_ai else "#D4AF37"
+    badge_color = "#A5D6A7" if is_cloud_ai else "#FFE082"
+    badge_icon = "✨" if is_cloud_ai else "🛡️"
+
     st.markdown(f"""
-    <div style="margin: 16px 0 14px 0; padding: 11px 14px; background: rgba(212, 175, 55, 0.12); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.45); text-align: center;">
-        <span style="color: #FFF1D0; font-size: 13.5px; font-weight: 600;">🌟 {plan.get('day_theme', '')}</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin: 12px 0 10px 0; padding: 8px 14px; background: {badge_bg}; border: 1px solid {badge_border}; border-radius: 10px;">
+        <span style="font-size:12.5px; font-weight:600; color:{badge_color};">{badge_icon} 生成來源：{html.escape(source_str)}</span>
+        <span style="font-size:11px; color:#D3C3B3;">耗時：{log.get('elapsed_seconds', 0.0) if log else 0.0}s</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    escaped_theme = html.escape(str(plan.get('day_theme', '')))
+    st.markdown(f"""
+    <div style="margin: 6px 0 14px 0; padding: 11px 14px; background: rgba(212, 175, 55, 0.12); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.45); text-align: center;">
+        <span style="color: #FFF1D0; font-size: 13.5px; font-weight: 600;">🌟 {escaped_theme}</span>
     </div>
     """, unsafe_allow_html=True)
     
     for item in plan.get("stories", []):
+        story_num = html.escape(str(item.get('story_number', '')))
+        time_slot = html.escape(str(item.get('time_slot', '間隔1.5hr')))
+        category = html.escape(str(item.get('category', '')))
+        role_badge = html.escape(str(item.get('role_badge', '')))
+        hook_copy = html.escape(str(item.get('hook_copy', '')))
+        visual_guide = html.escape(str(item.get('visual_guide', '')))
+        sticker_suggestion = html.escape(str(item.get('sticker_suggestion', '')))
+        highlight_tag = html.escape(str(item.get('highlight_tag', '')))
+
         st.markdown(f"""
         <div class="story-card-luxury">
             <div class="card-meta-bar">
-                <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
-                <span class="badge-time">⏰ 建議發佈：{item.get('time_slot', '間隔1.5hr')}</span>
-                <span class="badge-category">{item.get('category', '')}</span>
+                <span class="badge-number">STORY 0{story_num}</span>
+                <span class="badge-time">⏰ 建議發佈：{time_slot}</span>
+                <span class="badge-category">{category}</span>
             </div>
-            <div class="role-tag">{item.get('role_badge', '')}</div>
-            <div class="luxury-hook-text">「{item.get('hook_copy', '')}」</div>
-            <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
-            <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
-            <div class="highlight-box">{item.get('highlight_tag', '')}</div>
+            <div class="role-tag">{role_badge}</div>
+            <div class="luxury-hook-text">「{hook_copy}」</div>
+            <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{visual_guide}</div>
+            <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{sticker_suggestion}</div>
+            <div class="highlight-box">{highlight_tag}</div>
             <div class="safety-note">⚠️ 排版鐵律：字體最多2種、字色最多2種｜底圖太亮先調暗放安全區｜不發產品DM與AI滿版圖</div>
         </div>
         """, unsafe_allow_html=True)
+        # 提供手機端一鍵複製原始純文字文案
         st.code(item.get('hook_copy', ''), language="text")
+
+# ----------------- 系統執行日誌與除錯監控面板 -----------------
+if log:
+    with st.expander("📊 系統執行診斷與 API 監控紀錄", expanded=False):
+        c1, c2, c3 = st.columns(3)
+        c1.metric("指定調用模型", str(log.get("model")))
+        c2.metric("HTTP 狀態碼", str(log.get("http_code")) if log.get("http_code") else "本地略過")
+        c3.metric("總響應耗時", f"{log.get('elapsed_seconds', 0.0)} 秒")
+        
+        st.write(f"**執行時間點**：{log.get('timestamp')}")
+        st.write(f"**資料校驗狀態**：`{log.get('validation_result')}`")
+        if log.get("error_detail"):
+            st.warning(f"⚠️ **連線狀態提示**：{log.get('error_detail')}")
+        else:
+            st.success("✅ **連線狀態**：Gemini API 呼叫並校驗成功，無任何錯誤。")
 
 # ----------------- 底部常駐：02 發文前檢查 & 03 精選清單神回覆 -----------------
 st.markdown("---")
