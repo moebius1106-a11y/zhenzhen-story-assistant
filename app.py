@@ -1,14 +1,9 @@
 import os
 import json
-import time
-import socket
 import urllib.request
 import urllib.error
 from datetime import datetime
 import streamlit as st
-
-# 全域防止任何網路請求無限掛起 (硬性 12 秒上限)
-socket.setdefaulttimeout(12)
 
 # ----------------- 頁面與品牌配置 -----------------
 st.set_page_config(
@@ -214,8 +209,8 @@ def get_api_key():
         return key.strip().strip("'\"[] ")
     return None
 
-# ----------------- 核心調用函數 (直連 HTTP，嚴格 12 秒超時，絕不無限卡死) -----------------
-def generate_stories(day_idx: int, user_input: str, status_box):
+# ----------------- 核心調用函數 (放寬超時至 60 秒，精簡 Prompt 加速生成) -----------------
+def generate_stories(day_idx: int, user_input: str):
     api_key = get_api_key()
     if not api_key:
         raise ValueError("系統找不到 GEMINI_API_KEY，請確認 Streamlit App Settings -> Secrets 已設定！")
@@ -228,7 +223,7 @@ def generate_stories(day_idx: int, user_input: str, status_box):
     請嚴格遵守【限動一頁式攻略】與【賣貨版 7 天模板】規範，根據真真的日常輸入，生成今天的 9 篇限動腳本。
     
     【發文規則】：
-    1. 三明治結構：
+    1. 三明治結構（生活 ➔ 商業 ➔ 生活 ➔ 信任）：
        - 第 1 篇：【生活暖場】露臉/日常視角，第一句共鳴句，必須有強互動貼圖建議（投票/滑桿）。
        - 第 2 篇：【生活暖場】早晨/中午生活狀態，延續共鳴。
        - 第 3 篇：【使用產品】專業手法、施作微距、產品細節。
@@ -276,38 +271,28 @@ def generate_stories(day_idx: int, user_input: str, status_box):
         method="POST"
     )
     
-    # 單次調用若遇 503 短暫高峰自動等待 2 秒重試一次，總耗時絕不超過 15 秒
-    for attempt in range(2):
-        try:
-            status_box.info("👑 軍師正在連線為公主構思 9 格限動腳本...")
-            with urllib.request.urlopen(req, timeout=12) as response:
-                result = json.loads(response.read().decode("utf-8"))
-                if "candidates" not in result or not result["candidates"]:
-                    raise RuntimeError("API 回傳結果為空，請稍後重試。")
-                    
-                content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
-                start_idx = content_text.find("{")
-                end_idx = content_text.rfind("}")
-                if start_idx != -1 and end_idx != -1:
-                    json_str = content_text[start_idx:end_idx+1]
-                else:
-                    json_str = content_text
-                status_box.empty()
-                return json.loads(json_str)
-        except urllib.error.HTTPError as e:
-            err_body = e.read().decode('utf-8')
-            if e.code in (503, 429) and attempt == 0:
-                status_box.warning("⚡ 官方節點短暫高載，軍師正在重新連線（約需 2 秒）...")
-                time.sleep(2)
-                continue
-            status_box.empty()
-            raise RuntimeError(f"Google API 錯誤 ({e.code}): {err_body}")
-        except urllib.error.URLError as e:
-            status_box.empty()
-            raise RuntimeError(f"連線超時或網路失敗: {str(e.reason)}")
-        except Exception as e:
-            status_box.empty()
-            raise RuntimeError(f"系統處理異常: {str(e)}")
+    try:
+        # 設定充足的 60 秒超時，防止生成 9 篇時被伺服器強制切斷
+        with urllib.request.urlopen(req, timeout=60) as response:
+            result = json.loads(response.read().decode("utf-8"))
+            if "candidates" not in result or not result["candidates"]:
+                raise RuntimeError("API 回傳結果為空，請稍後重試。")
+                
+            content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+            start_idx = content_text.find("{")
+            end_idx = content_text.rfind("}")
+            if start_idx != -1 and end_idx != -1:
+                json_str = content_text[start_idx:end_idx+1]
+            else:
+                json_str = content_text
+            return json.loads(json_str)
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode('utf-8')
+        raise RuntimeError(f"Google API 錯誤 ({e.code}): {err_body}")
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"連線超時或網路失敗: {str(e.reason)}")
+    except Exception as e:
+        raise RuntimeError(f"系統處理異常: {str(e)}")
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
@@ -355,29 +340,28 @@ if generate_btn:
     if not user_thought.strip():
         st.warning("請先隨興打一句今天的瑣事或心情吧～不用動腦隨便寫就好！")
     else:
-        status_box = st.empty()
-        try:
-            data = generate_stories(today_idx, user_thought, status_box)
-            
-            st.markdown(f"""
-            <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
-                <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{data.get('day_theme', '')}</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            for item in data.get("stories", []):
+        with st.spinner("👑 軍師正在構思本日 9 格限動腳本（生成約需 10~15 秒，請稍候）..."):
+            try:
+                data = generate_stories(today_idx, user_thought)
+                
                 st.markdown(f"""
-                <div class="story-card-luxury">
-                    <div class="card-meta-bar">
-                        <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
-                        <span class="badge-category">{item.get('category', '')}</span>
-                    </div>
-                    <div class="luxury-hook-text">「{item.get('hook_copy', '')}」</div>
-                    <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
-                    <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
+                <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
+                    <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{data.get('day_theme', '')}</span>
                 </div>
                 """, unsafe_allow_html=True)
-                st.code(item.get('hook_copy', ''), language="text")
-        except Exception as e:
-            status_box.empty()
-            st.error(f"❌ 執行中斷提示：{str(e)}")
+                
+                for item in data.get("stories", []):
+                    st.markdown(f"""
+                    <div class="story-card-luxury">
+                        <div class="card-meta-bar">
+                            <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
+                            <span class="badge-category">{item.get('category', '')}</span>
+                        </div>
+                        <div class="luxury-hook-text">「{item.get('hook_copy', '')}」</div>
+                        <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
+                        <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    st.code(item.get('hook_copy', ''), language="text")
+            except Exception as e:
+                st.error(f"❌ 執行中斷提示：{str(e)}")
