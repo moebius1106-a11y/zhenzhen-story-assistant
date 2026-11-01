@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 import threading
 import time
-import urllib.request
 import streamlit as st
 from pydantic import BaseModel, Field
 from google import genai
@@ -10,15 +9,11 @@ from google.genai import types
 
 # ----------------- 防休眠常駐心跳機制 (Keep-Alive) -----------------
 def start_keep_alive():
-    """啟動後台守護線程，定期發送心跳確保應用程式常駐活躍"""
     if "keep_alive_started" not in st.session_state:
         st.session_state["keep_alive_started"] = True
-
         def ping_loop():
             while True:
-                time.sleep(600)  # 每 10 分鐘進行一次心跳記錄
-                # 保持後台線程活躍，防止 Streamlit 免費容器無動作回收
-
+                time.sleep(600)
         thread = threading.Thread(target=ping_loop, daemon=True)
         thread.start()
 
@@ -26,36 +21,36 @@ start_keep_alive()
 
 # ----------------- 頁面與品牌配置 -----------------
 st.set_page_config(
-    page_title="真真美學｜每日限動操盤助手",
+    page_title="真真公主專用｜每日限動操盤助手",
     page_icon="👑",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# 極致美業名媛奢華風 CSS (午夜深邃黑 / 淬鍊琥珀金 / 莫蘭迪金屬霧感 / 溫潤香檳光暈)
+# 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 手機端專屬自適應、絕不折字破版)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Noto Sans TC', sans-serif;
+        font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
     
     .stApp {
-        background: radial-gradient(circle at 50% 15%, #1C1917 0%, #0C0A09 100%) !important;
+        background: radial-gradient(circle at 50% 12%, #1C1917 0%, #0C0A09 100%) !important;
         color: #F5EBE1 !important;
     }
     
-    /* 頂部奢華 Header */
+    /* 頂部奢華 Header (針對 iPhone Pro Max 大螢幕自適應優化) */
     .luxury-header {
         text-align: center;
-        padding: 30px 20px 24px 20px;
-        background: linear-gradient(145deg, rgba(38, 33, 29, 0.85) 0%, rgba(20, 18, 16, 0.95) 100%);
+        padding: 24px 14px 20px 14px;
+        background: linear-gradient(145deg, rgba(38, 33, 29, 0.9) 0%, rgba(20, 18, 16, 0.98) 100%);
         border-radius: 20px;
         border: 1px solid rgba(212, 175, 55, 0.35);
-        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 223, 128, 0.2);
-        margin-bottom: 24px;
-        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 223, 128, 0.2);
+        margin-bottom: 20px;
     }
     
     .brand-crown {
@@ -64,12 +59,14 @@ st.markdown("""
         filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
     }
     
+    /* 主標題：自適應字體大小，白金漸層，單行不爆字 */
     .header-title {
         font-family: 'Noto Serif TC', serif;
-        font-size: 24px;
+        font-size: clamp(17px, 4.8vw, 22px);
         font-weight: 700;
-        letter-spacing: 2px;
-        background: linear-gradient(135deg, #FFF1D0 0%, #E8BE6B 50%, #B38634 100%);
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        background: linear-gradient(135deg, #FFF5DE 0%, #E8BE6B 50%, #B38634 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 6px;
@@ -77,44 +74,47 @@ st.markdown("""
     
     .header-eng {
         font-family: 'Cinzel', serif;
-        font-size: 11px;
-        letter-spacing: 4px;
-        color: #9C8979;
+        font-size: clamp(9px, 2.5vw, 11px);
+        letter-spacing: 2.5px;
+        color: #A3907F;
         text-transform: uppercase;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
+        white-space: nowrap;
     }
     
     .header-subtitle {
-        font-size: 13px;
+        font-size: clamp(11.5px, 3.2vw, 13px);
         color: #D3C3B3;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
         font-weight: 300;
+        line-height: 1.4;
     }
     
     /* 狀態卡片區塊 */
     .status-card-gold {
-        background: linear-gradient(145deg, rgba(42, 36, 30, 0.7) 0%, rgba(26, 22, 18, 0.85) 100%);
-        border: 1px solid rgba(212, 175, 55, 0.25);
+        background: linear-gradient(145deg, rgba(42, 36, 30, 0.75) 0%, rgba(26, 22, 18, 0.9) 100%);
+        border: 1px solid rgba(212, 175, 55, 0.28);
         border-radius: 14px;
-        padding: 14px 16px;
+        padding: 12px 14px;
         text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        margin-bottom: 10px;
     }
     .status-label {
-        font-size: 12px;
+        font-size: 11px;
         color: #A6917E;
         margin-bottom: 4px;
         letter-spacing: 1px;
     }
     .status-value {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         color: #F8E6C8;
     }
     
     /* 輸入框客製化 */
     div[data-baseweb="textarea"] {
-        background-color: rgba(28, 25, 23, 0.8) !important;
+        background-color: rgba(28, 25, 23, 0.85) !important;
         border: 1px solid rgba(212, 175, 55, 0.3) !important;
         border-radius: 14px !important;
         box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
@@ -130,9 +130,9 @@ st.markdown("""
     }
     label[data-testid="stWidgetLabel"] p {
         color: #E8D9CB !important;
-        font-size: 14px !important;
+        font-size: 13.5px !important;
         font-weight: 500 !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.3px !important;
     }
     
     /* 尊榮黑金漸層按鈕 */
@@ -141,72 +141,67 @@ st.markdown("""
         color: #1A1208 !important;
         font-weight: 700 !important;
         font-size: 16px !important;
-        letter-spacing: 2px !important;
+        letter-spacing: 1.5px !important;
         border: none !important;
         border-radius: 14px !important;
-        padding: 12px 24px !important;
+        padding: 13px 20px !important;
         box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35) !important;
         transition: all 0.3s ease !important;
     }
     .stButton > button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 10px 25px rgba(232, 190, 107, 0.5) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 24px rgba(232, 190, 107, 0.5) !important;
         color: #0A0704 !important;
     }
     
-    /* 限動腳本尊貴名媛卡片 */
+    /* 限動卡片 */
     .story-card-luxury {
-        background: linear-gradient(160deg, rgba(34, 30, 26, 0.9) 0%, rgba(20, 18, 16, 0.95) 100%);
+        background: linear-gradient(160deg, rgba(34, 30, 26, 0.92) 0%, rgba(20, 18, 16, 0.98) 100%);
         border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 20px;
+        padding: 18px 16px;
+        margin-bottom: 16px;
         border: 1px solid rgba(212, 175, 55, 0.25);
         border-left: 5px solid #D4AF37;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
-    
     .card-meta-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
-    
     .badge-number {
         font-family: 'Cinzel', serif;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         color: #1C1917;
         background: linear-gradient(135deg, #FFF1D0 0%, #E8BE6B 100%);
-        padding: 3px 12px;
+        padding: 3px 10px;
         border-radius: 20px;
         letter-spacing: 1px;
     }
-    
     .badge-category {
-        font-size: 12px;
+        font-size: 11.5px;
         font-weight: 600;
         color: #E6CFA8;
         background: rgba(212, 175, 55, 0.12);
-        padding: 3px 12px;
+        padding: 3px 10px;
         border-radius: 20px;
         border: 1px solid rgba(212, 175, 55, 0.3);
     }
-    
     .luxury-hook-text {
-        font-size: 15px;
+        font-size: 14.5px;
         font-weight: 500;
         color: #FFFFFF;
         line-height: 1.6;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
         padding: 12px 14px;
-        background: rgba(14, 12, 10, 0.6);
+        background: rgba(14, 12, 10, 0.65);
         border-radius: 10px;
         border-left: 3px solid #E8BE6B;
     }
-    
     .meta-line {
-        font-size: 13px;
+        font-size: 12.5px;
         color: #C8B9A6;
         margin-bottom: 6px;
         line-height: 1.5;
@@ -239,9 +234,6 @@ def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
         
     client = genai.Client(api_key=api_key)
     
-    # 嚴格遵循【賣貨版 7 天模板】輪播機制
-    # 第 5 篇：奇數天(商品介紹) / 偶數天(商品QA)
-    # 第 9 篇：奇數天(關於我) / 偶數天(里程碑)
     qa_or_intro = "商品介紹" if day_idx % 2 == 1 else "商品QA"
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
     
@@ -262,7 +254,7 @@ def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
        - 第 9 篇：指定主題【{about_or_milestone}】（品牌堅持、進修收穫、證照或大女主價值觀）。
     
     2. 文案語氣：
-       - 成熟知性、鬆弛自然、像懂生活的老友在聊日常，堅決避免生硬叫賣與行銷感。
+       - 成熟知性、鬆弛自然、像懂生活的老友在聊日常，堅決避免生硬叫賣與推銷感。
        - 文字精練，每則文案在 40~50 字以內，方便手機一鍵複製。
     
     今日真真輸入的真實日常或想分享的點滴：
@@ -270,7 +262,7 @@ def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
     """
     
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.8-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
@@ -284,8 +276,8 @@ def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
 st.markdown("""
 <div class="luxury-header">
     <div class="brand-crown">👑</div>
-    <div class="header-title">真真美學 ｜ 每日限動操盤助手</div>
-    <div class="header-eng">ZHENZHEN AESTHETICS · STORY CURATOR</div>
+    <div class="header-title">真真公主專用 ｜ 每日限動操盤助手</div>
+    <div class="header-eng">PRINCESS ZHENZHEN · DAILY STORY CURATOR</div>
     <div class="header-subtitle">把生活瑣碎化為動人光彩 · 讓專業於無形中綻放</div>
 </div>
 """, unsafe_allow_html=True)
@@ -314,7 +306,7 @@ st.write("")
 
 user_thought = st.text_area(
     "💬 公主今天有什麼日常、心情或客人對話？（隨興打一句就好）",
-    placeholder="例如：今天偷得半日閒去吃私房甜點切蛋糕，順道買了小魚小蝦回店裡放，下午客人做完深層淨膚直呼臉亮得像燈泡...",
+    placeholder="例如：客人送一杯咖啡，下午做完深層淨膚直呼臉亮得像燈泡...",
     height=95
 )
 
@@ -348,6 +340,6 @@ if generate_btn:
                         <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.sticker_suggestion}</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    st.code(item.hook_copy, language="text") # 手機端專屬快速複製
+                    st.code(item.hook_copy, language="text")
             except Exception as e:
                 st.error(f"生成出錯：{str(e)}")
