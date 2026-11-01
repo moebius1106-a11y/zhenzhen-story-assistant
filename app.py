@@ -13,10 +13,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 完美自適應)
+# 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 完美自適應、絕不折字破版)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+    @import url('[https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap](https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap)');
     
     html, body, [class*="css"] {
         font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -28,6 +28,7 @@ st.markdown("""
         color: #F5EBE1 !important;
     }
     
+    /* 頂部奢華 Header (針對 iPhone Pro Max 大螢幕自適應優化) */
     .luxury-header {
         text-align: center;
         padding: 24px 14px 20px 14px;
@@ -44,9 +45,10 @@ st.markdown("""
         filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
     }
     
+    /* 主標題：自適應字體大小，白金漸層，單行不爆字 */
     .header-title {
         font-family: 'Noto Serif TC', serif;
-        font-size: clamp(16px, 4.6vw, 22px);
+        font-size: clamp(15px, 4.3vw, 20px);
         font-weight: 700;
         letter-spacing: 0.5px;
         white-space: nowrap;
@@ -58,7 +60,7 @@ st.markdown("""
     
     .header-eng {
         font-family: 'Cinzel', serif;
-        font-size: clamp(9px, 2.5vw, 11px);
+        font-size: clamp(8.5px, 2.4vw, 11px);
         letter-spacing: 2px;
         color: #A3907F;
         text-transform: uppercase;
@@ -74,6 +76,7 @@ st.markdown("""
         line-height: 1.4;
     }
     
+    /* 狀態卡片區塊 */
     .status-card-gold {
         background: linear-gradient(145deg, rgba(42, 36, 30, 0.75) 0%, rgba(26, 22, 18, 0.9) 100%);
         border: 1px solid rgba(212, 175, 55, 0.28);
@@ -95,6 +98,7 @@ st.markdown("""
         color: #F8E6C8;
     }
     
+    /* 輸入框客製化 */
     div[data-baseweb="textarea"] {
         background-color: rgba(28, 25, 23, 0.85) !important;
         border: 1px solid rgba(212, 175, 55, 0.3) !important;
@@ -117,6 +121,7 @@ st.markdown("""
         letter-spacing: 0.3px !important;
     }
     
+    /* 尊榮黑金漸層按鈕 */
     .stButton > button {
         background: linear-gradient(135deg, #F0CF86 0%, #D4AF37 50%, #9E7422 100%) !important;
         color: #1A1208 !important;
@@ -135,6 +140,7 @@ st.markdown("""
         color: #0A0704 !important;
     }
     
+    /* 限動卡片 */
     .story-card-luxury {
         background: linear-gradient(160deg, rgba(34, 30, 26, 0.92) 0%, rgba(20, 18, 16, 0.98) 100%);
         border-radius: 16px;
@@ -193,25 +199,29 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 獲取 API 金鑰 (雙重相容) -----------------
+# ----------------- 獲取 API 金鑰 (多重路徑保障) -----------------
 def get_api_key():
-    if "GEMINI_API_KEY" in st.secrets:
-        return st.secrets["GEMINI_API_KEY"]
-    if "GEMINI_API_KEY" in os.environ:
-        return os.environ["GEMINI_API_KEY"]
+    try:
+        if "GEMINI_API_KEY" in st.secrets:
+            return str(st.secrets["GEMINI_API_KEY"]).strip()
+    except Exception:
+        pass
+    val = os.environ.get("GEMINI_API_KEY")
+    if val:
+        return val.strip()
     return None
 
-# ----------------- 核心調用函數 (直連 HTTP，絕不死鎖) -----------------
+# ----------------- 核心調用函數 (直連 HTTP 協定，超時放寬至 45 秒) -----------------
 def generate_stories(day_idx: int, user_input: str):
     api_key = get_api_key()
     if not api_key:
-        raise ValueError("系統找不到 GEMINI_API_KEY，請確認 Streamlit App Settings -> Secrets 已設定！")
+        raise ValueError("系統找不到 GEMINI_API_KEY，請確認 Streamlit App Settings -> Secrets 已正確填寫！")
         
     qa_or_intro = "商品介紹" if day_idx % 2 == 1 else "商品QA"
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
     
     prompt = f"""
-    你是美業大女主「真真美學」的首席自媒體操盤顧問，使用者為「真真公主（鄭鈺真）」。
+    你是美業高質感品牌「真真美學」的首席自媒體操盤顧問，使用者為「真真公主（鄭鈺真）」。
     請嚴格遵守【限動一頁式攻略】與【賣貨版 7 天模板】規範，根據真真的日常輸入，生成今天的 9 篇限動腳本。
     
     【發文規則】：
@@ -245,7 +255,7 @@ def generate_stories(day_idx: int, user_input: str):
     }}
     """
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=){api_key}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -262,19 +272,29 @@ def generate_stories(day_idx: int, user_input: str):
     )
     
     try:
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with urllib.request.urlopen(req, timeout=45) as response:
             result = json.loads(response.read().decode("utf-8"))
+            if "candidates" not in result or not result["candidates"]:
+                err_feedback = result.get("promptFeedback", "模型未返回候選內容")
+                raise RuntimeError(f"API 無輸出內容：{err_feedback}")
+                
             content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
-            if content_text.startswith("```json"):
-                content_text = content_text[7:]
-            if content_text.endswith("```"):
-                content_text = content_text[:-3]
-            return json.loads(content_text.strip())
+            raw_text = content_text
+            if raw_text.startswith("```"):
+                lines = raw_text.split("\n")
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines and lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                raw_text = "\n".join(lines).strip()
+            return json.loads(raw_text)
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode('utf-8')
         raise RuntimeError(f"Google API 錯誤 ({e.code}): {err_msg}")
+    except urllib.error.URLError as e:
+        raise RuntimeError(f"網路連線逾時或失敗: {str(e.reason)}")
     except Exception as e:
-        raise RuntimeError(f"連線失敗: {str(e)}")
+        raise RuntimeError(f"系統處理異常: {str(e)}")
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
