@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime
@@ -28,7 +29,6 @@ st.markdown("""
         color: #F5EBE1 !important;
     }
     
-    /* 頂部奢華 Header (針對 iPhone Pro Max 大螢幕自適應優化) */
     .luxury-header {
         text-align: center;
         padding: 24px 14px 20px 14px;
@@ -45,7 +45,6 @@ st.markdown("""
         filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
     }
     
-    /* 主標題：自適應字體大小，白金漸層，單行不爆字 */
     .header-title {
         font-family: 'Noto Serif TC', serif;
         font-size: clamp(15px, 4.3vw, 20px);
@@ -76,7 +75,6 @@ st.markdown("""
         line-height: 1.4;
     }
     
-    /* 狀態卡片區塊 */
     .status-card-gold {
         background: linear-gradient(145deg, rgba(42, 36, 30, 0.75) 0%, rgba(26, 22, 18, 0.9) 100%);
         border: 1px solid rgba(212, 175, 55, 0.28);
@@ -98,7 +96,6 @@ st.markdown("""
         color: #F8E6C8;
     }
     
-    /* 輸入框客製化 */
     div[data-baseweb="textarea"] {
         background-color: rgba(28, 25, 23, 0.85) !important;
         border: 1px solid rgba(212, 175, 55, 0.3) !important;
@@ -121,7 +118,6 @@ st.markdown("""
         letter-spacing: 0.3px !important;
     }
     
-    /* 尊榮黑金漸層按鈕 */
     .stButton > button {
         background: linear-gradient(135deg, #F0CF86 0%, #D4AF37 50%, #9E7422 100%) !important;
         color: #1A1208 !important;
@@ -140,7 +136,6 @@ st.markdown("""
         color: #0A0704 !important;
     }
     
-    /* 限動卡片 */
     .story-card-luxury {
         background: linear-gradient(160deg, rgba(34, 30, 26, 0.92) 0%, rgba(20, 18, 16, 0.98) 100%);
         border-radius: 16px;
@@ -199,7 +194,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 獲取 API 金鑰 (自動清除多餘引號與括號) -----------------
+# ----------------- 獲取 API 金鑰 (多重路徑保障與字符清洗) -----------------
 def get_api_key():
     key = None
     try:
@@ -215,7 +210,7 @@ def get_api_key():
         return key.strip().strip("'\"[] ")
     return None
 
-# ----------------- 核心調用函數 (網址防呆清洗 + 純淨 JSON 提取) -----------------
+# ----------------- 核心調用函數 (內建 503/429 指數退避重試 + 雙模型備援) -----------------
 def generate_stories(day_idx: int, user_input: str):
     api_key = get_api_key()
     if not api_key:
@@ -259,10 +254,6 @@ def generate_stories(day_idx: int, user_input: str):
     }}
     """
     
-    # 自動防呆過濾：移除開頭與結尾誤貼的任何括號、引號或空格
-    raw_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={api_key}"
-    clean_url = raw_url.strip().replace("[", "").replace("]", "").replace("'", "").replace('"', "")
-    
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -271,37 +262,54 @@ def generate_stories(day_idx: int, user_input: str):
         }
     }
     
-    req = urllib.request.Request(
-        clean_url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST"
-    )
+    # 針對 503 (High Demand) 與 429 的模型備援清單
+    models_to_try = ["gemini-3.8-flash", "gemini-3.8-pro"]
+    last_error = None
     
-    try:
-        with urllib.request.urlopen(req, timeout=40) as response:
-            result = json.loads(response.read().decode("utf-8"))
-            if "candidates" not in result or not result["candidates"]:
-                raise RuntimeError("API 回傳結果為空，請稍後重試。")
-                
-            content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
-            
-            # 精確抓取 JSON 起訖位置，避免任何外部雜訊干擾
-            start_idx = content_text.find("{")
-            end_idx = content_text.rfind("}")
-            if start_idx != -1 and end_idx != -1:
-                json_str = content_text[start_idx:end_idx+1]
-            else:
-                json_str = content_text
-                
-            return json.loads(json_str)
-    except urllib.error.HTTPError as e:
-        err_msg = e.read().decode('utf-8')
-        raise RuntimeError(f"Google API 錯誤 ({e.code}): {err_msg}")
-    except urllib.error.URLError as e:
-        raise RuntimeError(f"網路連線失敗: {str(e.reason)}")
-    except Exception as e:
-        raise RuntimeError(f"處理異常: {str(e)}")
+    for model_name in models_to_try:
+        clean_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={api_key}"
+        clean_url = clean_url.strip().replace("[", "").replace("]", "").replace("'", "").replace('"', "")
+        
+        req = urllib.request.Request(
+            clean_url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        
+        # 遇 503 自動重試最多 3 次
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=40) as response:
+                    result = json.loads(response.read().decode("utf-8"))
+                    if "candidates" not in result or not result["candidates"]:
+                        raise RuntimeError("API 回傳結果為空，請稍後重試。")
+                        
+                    content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+                    start_idx = content_text.find("{")
+                    end_idx = content_text.rfind("}")
+                    if start_idx != -1 and end_idx != -1:
+                        json_str = content_text[start_idx:end_idx+1]
+                    else:
+                        json_str = content_text
+                        
+                    return json.loads(json_str)
+            except urllib.error.HTTPError as e:
+                err_body = e.read().decode('utf-8')
+                last_error = f"Google API 錯誤 ({e.code}): {err_body}"
+                if e.code in (503, 429) and attempt < 2:
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                else:
+                    break
+            except urllib.error.URLError as e:
+                last_error = f"網路連線失敗: {str(e.reason)}"
+                break
+            except Exception as e:
+                last_error = f"處理異常: {str(e)}"
+                break
+
+    raise RuntimeError(last_error or "服務暫時無法連線，請稍後重試")
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
