@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 完美自適應、絕不折字破版)
-st.markdown("""
+st.markdown('''
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
     
@@ -191,7 +191,7 @@ st.markdown("""
         font-weight: 600;
     }
 </style>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
 # ----------------- 獲取 API 金鑰 -----------------
 def get_api_key():
@@ -206,7 +206,9 @@ def get_api_key():
         if val:
             key = val.strip()
     if key:
-        return key.strip().strip("'"[] ")
+        for ch in [" ", "'", '"', "[", "]"]:
+            key = key.replace(ch, "")
+        return key.strip()
     return None
 
 # ----------------- 核心調用函數 (精簡 Token + 極速秒出) -----------------
@@ -218,7 +220,7 @@ def generate_stories(day_idx: int, user_input: str):
     qa_or_intro = "商品介紹" if day_idx % 2 == 1 else "商品QA"
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
     
-    prompt = f"""
+    prompt = f'''
     你是美業高質感品牌「真真美學」的首席操盤顧問，使用者為創辦人「真真公主（鄭鈺真）」。
     請遵守【限動一頁式攻略】與【賣貨版 7 天模板】SOP，根據日常輸入產出 9 則精煉限動：
     1. 生活暖場 (露臉+共鳴互動)
@@ -240,10 +242,12 @@ def generate_stories(day_idx: int, user_input: str):
     
     輸出純 JSON：
     {{"day_theme":"本日主題","stories":[{{"story_number":1,"category":"分類","hook_copy":"文案","visual_guide":"配圖","sticker_suggestion":"貼圖"}}]}}
-    """
+    '''
     
     clean_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={api_key}"
-    clean_url = clean_url.strip().replace("[", "").replace("]", "").replace("'", "").replace('"', "")
+    for ch in ["[", "]", "'", '"']:
+        clean_url = clean_url.replace(ch, "")
+    clean_url = clean_url.strip()
     
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -284,14 +288,14 @@ def generate_stories(day_idx: int, user_input: str):
         raise RuntimeError(f"系統處理異常: {str(e)}")
 
 # ----------------- 介面與交互 -----------------
-st.markdown("""
+st.markdown('''
 <div class="luxury-header">
     <div class="brand-crown">👑</div>
     <div class="header-title">真真公主專用 ｜ 每日限動操盤助手</div>
     <div class="header-eng">PRINCESS ZHENZHEN · DAILY STORY CURATOR</div>
     <div class="header-subtitle">把生活瑣碎化為動人光彩 · 讓專業於無形中綻放</div>
 </div>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
 now = datetime.now()
 day_map = {1: "週一", 2: "週二", 3: "週三", 4: "週四", 5: "週五", 6: "週六", 7: "週日"}
@@ -299,19 +303,19 @@ today_idx = now.isoweekday()
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    st.markdown(f"""
+    st.markdown(f'''
     <div class="status-card-gold">
         <div class="status-label">TODAY ｜ 當前排程</div>
         <div class="status-value">📅 {day_map[today_idx]}</div>
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 with col2:
-    st.markdown(f"""
+    st.markdown(f'''
     <div class="status-card-gold">
         <div class="status-label">KEY FOCUS ｜ 今日重點</div>
         <div class="status-value">✨ {'商品介紹' if today_idx % 2 == 1 else '商品QA'} ＋ {'關於我' if today_idx % 2 == 1 else '里程碑'}</div>
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
 
 st.write("")
 
@@ -342,14 +346,14 @@ if generate_btn:
 # 渲染持久化結果
 plan = st.session_state.get("story_plan")
 if plan and isinstance(plan, dict):
-    st.markdown(f"""
+    st.markdown(f'''
     <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
         <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{plan.get('day_theme', '')}</span>
     </div>
-    """, unsafe_allow_html=True)
+    ''', unsafe_allow_html=True)
     
     for item in plan.get("stories", []):
-        st.markdown(f"""
+        st.markdown(f'''
         <div class="story-card-luxury">
             <div class="card-meta-bar">
                 <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
@@ -359,5 +363,5 @@ if plan and isinstance(plan, dict):
             <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
             <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
         </div>
-        """, unsafe_allow_html=True)
+        ''', unsafe_allow_html=True)
         st.code(item.get('hook_copy', ''), language="text")
