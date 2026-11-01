@@ -1,23 +1,9 @@
 import os
+import json
 from datetime import datetime
-import threading
-import time
 import streamlit as st
-from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
-
-# ----------------- 防休眠常駐心跳機制 (Keep-Alive) -----------------
-def start_keep_alive():
-    if "keep_alive_started" not in st.session_state:
-        st.session_state["keep_alive_started"] = True
-        def ping_loop():
-            while True:
-                time.sleep(600)
-        thread = threading.Thread(target=ping_loop, daemon=True)
-        thread.start()
-
-start_keep_alive()
 
 # ----------------- 頁面與品牌配置 -----------------
 st.set_page_config(
@@ -213,23 +199,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 資料結構定義 -----------------
-class StoryItem(BaseModel):
-    story_number: int = Field(description="第 1 到 9 篇限動順序")
-    category: str = Field(description="分類：生活暖場/使用產品/客戶反饋/商品介紹/商品QA/生活放鬆/關於我/里程碑")
-    hook_copy: str = Field(description="口語、成熟優雅、像閨蜜聊天的精煉文案（45字以內，方便手機直接複製）")
-    sticker_suggestion: str = Field(description="建議搭配的 IG 互動貼圖（如投票、表情滑桿、問答貼紙、私訊關鍵字等）")
-    visual_guide: str = Field(description="建議配圖（如：今天拍的切蛋糕照片、做臉施作微距、魚缸小短片、客人好評對話截圖等）")
-
-class DailyStoryPlan(BaseModel):
-    day_theme: str = Field(description="本日限動核心氛圍或情感金句")
-    stories: list[StoryItem]
-
-# ----------------- 生成核心函數 -----------------
-def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
+# ----------------- 生成核心函數 (超速輕量 JSON 解析) -----------------
+def generate_stories(day_idx: int, user_input: str):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        st.error("⚠️ 請確認系統環境已配置 GEMINI_API_KEY")
+        st.error("⚠️ 請確認 Streamlit Secrets 已配置 GEMINI_API_KEY")
         st.stop()
         
     client = genai.Client(api_key=api_key)
@@ -238,39 +212,54 @@ def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
     
     prompt = f"""
-    你是美業高質感品牌「真真美學」的首席自媒體幕僚顧問。
-    使用者為創辦人「真真（鄭鈺真）」，她是獨立自主、優雅大氣、經歷過人生起伏但越活越通透的品牌大女主。
+    你是美業大女主「真真美學」的首席自媒體操盤顧問，使用者為「真真公主（鄭鈺真）」。
+    請嚴格遵守【限動一頁式攻略】與【賣貨版 7 天模板】規範，根據真真的日常輸入，生成今天的 9 篇限動腳本。
     
-    請嚴格遵守【天使傳聲機·限動一頁式攻略】與【賣貨版 7 天模板】SOP 規範：
-    1. 產出 9 篇三明治夾心限動（生活暖場 ➔ 專業見證 ➔ 生活放鬆 ➔ 信任背書）：
-       - 第 1 篇：【生活暖場】露臉或日常視角，第一句共鳴句，必須有強互動鉤子（投票/滑桿）。
-       - 第 2 篇：【生活暖場】接續早晨/中午生活狀態，延續共鳴。
-       - 第 3 篇：【使用產品】專業施作畫面、手法細節、原料特寫。
-       - 第 4 篇：【客戶反饋】顧客見證、滿意回饋對話、施作前後透亮對比。
+    【發文規則】：
+    1. 三明治結構：
+       - 第 1 篇：【生活暖場】露臉/日常視角，第一句共鳴句，必須有強互動貼圖建議（投票/滑桿）。
+       - 第 2 篇：【生活暖場】早晨/中午生活狀態，延續共鳴。
+       - 第 3 篇：【使用產品】專業手法、施作微距、產品細節。
+       - 第 4 篇：【客戶反饋】顧客好評、見證回饋、前後透亮對比。
        - 第 5 篇：指定主題【{qa_or_intro}】（痛點解答或好物亮點）。
        - 第 6 篇：【生活放鬆】生活瑣碎小事、下午茶、隨筆抒發。
-       - 第 7 篇：【生活放鬆】店內放鬆氛圍（如魚缸游動、店內香氛、小植物）。
-       - 第 8 篇：【生活放鬆】傍晚/收工心境，真實不裝的生活感。
-       - 第 9 篇：指定主題【{about_or_milestone}】（品牌堅持、進修收穫、證照或大女主價值觀）。
+       - 第 7 篇：【生活放鬆】店內放鬆氛圍（魚缸、香氛、小植物）。
+       - 第 8 篇：【生活放鬆】傍晚/收工心境，真實生活感。
+       - 第 9 篇：指定主題【{about_or_milestone}】（品牌理念、進修證照或大女主價值觀）。
+    2. 文案語氣：成熟知性、鬆弛自然、像懂生活的朋友在聊天，絕不要生硬推銷。每篇 40~50 字以內。
     
-    2. 文案語氣：
-       - 成熟知性、鬆弛自然、像懂生活的老友在聊日常，堅決避免生硬叫賣與推銷感。
-       - 文字精練，每則文案在 40~50 字以內，方便手機一鍵複製。
-    
-    今日真真輸入的真實日常或想分享的點滴：
+    真真的日常輸入：
     「{user_input}」
+    
+    請以乾淨的純 JSON 格式輸出（不要加上 markdown 程式碼區塊標記），格式如下：
+    {{
+      "day_theme": "本日核心氛圍主題",
+      "stories": [
+        {{
+          "story_number": 1,
+          "category": "生活暖場",
+          "hook_copy": "限動文案",
+          "visual_guide": "建議配圖",
+          "sticker_suggestion": "建議互動貼圖"
+        }}
+      ]
+    }}
     """
     
     response = client.models.generate_content(
-        model="gemini-3.8-flash",
+        model="gemini-2.5-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
-            response_schema=DailyStoryPlan,
-            temperature=0.75
+            temperature=0.7
         )
     )
-    return DailyStoryPlan.model_validate_json(response.text)
+    raw_text = response.text.strip()
+    if raw_text.startswith("```json"):
+        raw_text = raw_text[7:]
+    if raw_text.endswith("```"):
+        raw_text = raw_text[:-3]
+    return json.loads(raw_text.strip())
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
@@ -320,26 +309,26 @@ if generate_btn:
     else:
         with st.spinner("軍師正在為公主排定本日 9 則高轉化限動腳本..."):
             try:
-                plan = generate_stories(today_idx, user_thought)
+                data = generate_stories(today_idx, user_thought)
                 
                 st.markdown(f"""
                 <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
-                    <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{plan.day_theme}</span>
+                    <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{data.get('day_theme', '')}</span>
                 </div>
                 """, unsafe_allow_html=True)
                 
-                for item in plan.stories:
+                for item in data.get("stories", []):
                     st.markdown(f"""
                     <div class="story-card-luxury">
                         <div class="card-meta-bar">
-                            <span class="badge-number">STORY 0{item.story_number}</span>
-                            <span class="badge-category">{item.category}</span>
+                            <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
+                            <span class="badge-category">{item.get('category', '')}</span>
                         </div>
-                        <div class="luxury-hook-text">「{item.hook_copy}」</div>
-                        <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.visual_guide}</div>
-                        <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.sticker_suggestion}</div>
+                        <div class="luxury-hook-text">「{item.get('hook_copy', '')}」</div>
+                        <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
+                        <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    st.code(item.hook_copy, language="text")
+                    st.code(item.get('hook_copy', ''), language="text")
             except Exception as e:
                 st.error(f"生成出錯：{str(e)}")
