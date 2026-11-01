@@ -193,7 +193,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 獲取 API 金鑰 (多重路徑保障與字符清洗) -----------------
+# ----------------- 獲取 API 金鑰 -----------------
 def get_api_key():
     key = None
     try:
@@ -209,7 +209,7 @@ def get_api_key():
         return key.strip().strip("'\"[] ")
     return None
 
-# ----------------- 核心調用函數 (放寬超時至 60 秒，精簡 Prompt 加速生成) -----------------
+# ----------------- 核心調用函數 (精簡 Token + 極速秒出) -----------------
 def generate_stories(day_idx: int, user_input: str):
     api_key = get_api_key()
     if not api_key:
@@ -219,38 +219,27 @@ def generate_stories(day_idx: int, user_input: str):
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
     
     prompt = f"""
-    你是美業高質感品牌「真真美學」的首席自媒體操盤顧問，使用者為「真真公主（鄭鈺真）」。
-    請嚴格遵守【限動一頁式攻略】與【賣貨版 7 天模板】規範，根據真真的日常輸入，生成今天的 9 篇限動腳本。
+    你是美業高質感品牌「真真美學」的首席操盤顧問，使用者為創辦人「真真公主（鄭鈺真）」。
+    請遵守【限動一頁式攻略】與【賣貨版 7 天模板】SOP，根據日常輸入產出 9 則精煉限動：
+    1. 生活暖場 (露臉+共鳴互動)
+    2. 生活暖場 (日常狀態)
+    3. 使用產品 (手法細節)
+    4. 客戶反饋 (好評對比)
+    5. 指定主題：{qa_or_intro}
+    6. 生活放鬆 (隨筆小事)
+    7. 生活放鬆 (魚缸香氛店內氛圍)
+    8. 生活放鬆 (下班心境)
+    9. 指定主題：{about_or_milestone} (品牌理念/大女主價值觀)
     
-    【發文規則】：
-    1. 三明治結構（生活 ➔ 商業 ➔ 生活 ➔ 信任）：
-       - 第 1 篇：【生活暖場】露臉/日常視角，第一句共鳴句，必須有強互動貼圖建議（投票/滑桿）。
-       - 第 2 篇：【生活暖場】早晨/中午生活狀態，延續共鳴。
-       - 第 3 篇：【使用產品】專業手法、施作微距、產品細節。
-       - 第 4 篇：【客戶反饋】顧客好評、見證回饋、前後透亮對比。
-       - 第 5 篇：指定主題【{qa_or_intro}】（痛點解答或好物亮點）。
-       - 第 6 篇：【生活放鬆】生活瑣碎小事、下午茶、隨筆抒發。
-       - 第 7 篇：【生活放鬆】店內放鬆氛圍（魚缸、香氛、小植物）。
-       - 第 8 篇：【生活放鬆】傍晚/收工心境，真實生活感。
-       - 第 9 篇：指定主題【{about_or_milestone}】（品牌理念、進修證照或大女主價值觀）。
-    2. 文案語氣：成熟知性、鬆弛自然、像懂生活的朋友在聊天，絕不要生硬推銷。每篇 40~50 字以內。
+    【核心要求】：
+    - 語氣：鬆弛知性、閨蜜聊天感。
+    - 每篇 hook_copy 嚴格限制在 25-35 字以內（兩行內，手機極速閱讀）。
+    - visual_guide 與 sticker_suggestion 10 字以內簡短具體。
     
-    真真的日常輸入：
-    「{user_input}」
+    日常輸入：「{user_input}」
     
-    請以乾淨的純 JSON 格式輸出：
-    {{
-      "day_theme": "本日核心氛圍主題",
-      "stories": [
-        {{
-          "story_number": 1,
-          "category": "生活暖場",
-          "hook_copy": "限動文案",
-          "visual_guide": "建議配圖",
-          "sticker_suggestion": "建議互動貼圖"
-        }}
-      ]
-    }}
+    輸出純 JSON：
+    {{"day_theme":"本日主題","stories":[{{"story_number":1,"category":"分類","hook_copy":"文案","visual_guide":"配圖","sticker_suggestion":"貼圖"}}]}}
     """
     
     clean_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={api_key}"
@@ -260,7 +249,8 @@ def generate_stories(day_idx: int, user_input: str):
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "temperature": 0.7
+            "temperature": 0.7,
+            "maxOutputTokens": 1000
         }
     }
     
@@ -272,11 +262,10 @@ def generate_stories(day_idx: int, user_input: str):
     )
     
     try:
-        # 設定充足的 60 秒超時，防止生成 9 篇時被伺服器強制切斷
-        with urllib.request.urlopen(req, timeout=60) as response:
+        with urllib.request.urlopen(req, timeout=40) as response:
             result = json.loads(response.read().decode("utf-8"))
             if "candidates" not in result or not result["candidates"]:
-                raise RuntimeError("API 回傳結果為空，請稍後重試。")
+                raise RuntimeError("API 回傳為空，請重試。")
                 
             content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
             start_idx = content_text.find("{")
@@ -334,34 +323,41 @@ user_thought = st.text_area(
 
 st.write("")
 
+# 狀態持久化：避免手機操作或微小重繪導致產出內容遺失
+if "story_plan" not in st.session_state:
+    st.session_state["story_plan"] = None
+
 generate_btn = st.button("✨ 一鍵排好今日 9 格限動腳本", use_container_width=True)
 
 if generate_btn:
     if not user_thought.strip():
         st.warning("請先隨興打一句今天的瑣事或心情吧～不用動腦隨便寫就好！")
     else:
-        with st.spinner("👑 軍師正在構思本日 9 格限動腳本（生成約需 10~15 秒，請稍候）..."):
+        with st.spinner("👑 軍師正在構思本日 9 格限動腳本（約需 3~5 秒）..."):
             try:
-                data = generate_stories(today_idx, user_thought)
-                
-                st.markdown(f"""
-                <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
-                    <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{data.get('day_theme', '')}</span>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                for item in data.get("stories", []):
-                    st.markdown(f"""
-                    <div class="story-card-luxury">
-                        <div class="card-meta-bar">
-                            <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
-                            <span class="badge-category">{item.get('category', '')}</span>
-                        </div>
-                        <div class="luxury-hook-text">「{item.get('hook_copy', '')}」</div>
-                        <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
-                        <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    st.code(item.get('hook_copy', ''), language="text")
+                st.session_state["story_plan"] = generate_stories(today_idx, user_thought)
             except Exception as e:
                 st.error(f"❌ 執行中斷提示：{str(e)}")
+
+# 渲染持久化結果
+plan = st.session_state.get("story_plan")
+if plan and isinstance(plan, dict):
+    st.markdown(f"""
+    <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
+        <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{plan.get('day_theme', '')}</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    for item in plan.get("stories", []):
+        st.markdown(f"""
+        <div class="story-card-luxury">
+            <div class="card-meta-bar">
+                <span class="badge-number">STORY 0{item.get('story_number', '')}</span>
+                <span class="badge-category">{item.get('category', '')}</span>
+            </div>
+            <div class="luxury-hook-text">「{item.get('hook_copy', '')}」</div>
+            <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.get('visual_guide', '')}</div>
+            <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.get('sticker_suggestion', '')}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.code(item.get('hook_copy', ''), language="text")
