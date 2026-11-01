@@ -13,114 +13,188 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 手機端專屬高級美學 CSS (莫蘭迪香檳金 + 柔和奶杏調)
+# 極致美業名媛奢華風 CSS (午夜深邃黑 / 淬鍊琥珀金 / 莫蘭迪金屬霧感 / 溫潤香檳光暈)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Noto Sans TC', sans-serif;
     }
     
     .stApp {
-        background: linear-gradient(180deg, #FDFBF7 0%, #F8F5F0 100%);
+        background: radial-gradient(circle at 50% 15%, #1C1917 0%, #0C0A09 100%) !important;
+        color: #F5EBE1 !important;
     }
     
-    .header-box {
+    /* 頂部奢華 Header */
+    .luxury-header {
         text-align: center;
-        padding: 24px 16px 16px 16px;
-        background: #FFFFFF;
-        border-radius: 18px;
-        box-shadow: 0 4px 20px rgba(184, 150, 106, 0.08);
-        border: 1px solid #F0E6D8;
-        margin-bottom: 20px;
+        padding: 30px 20px 24px 20px;
+        background: linear-gradient(145deg, rgba(38, 33, 29, 0.85) 0%, rgba(20, 18, 16, 0.95) 100%);
+        border-radius: 20px;
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 223, 128, 0.2);
+        margin-bottom: 24px;
+        position: relative;
+    }
+    
+    .brand-crown {
+        font-size: 26px;
+        margin-bottom: 4px;
+        filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
     }
     
     .header-title {
-        font-size: 22px;
+        font-family: 'Noto Serif TC', serif;
+        font-size: 24px;
         font-weight: 700;
-        color: #3C332A;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+        background: linear-gradient(135deg, #FFF1D0 0%, #E8BE6B 50%, #B38634 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 6px;
+    }
+    
+    .header-eng {
+        font-family: 'Cinzel', serif;
+        font-size: 11px;
+        letter-spacing: 4px;
+        color: #9C8979;
+        text-transform: uppercase;
+        margin-bottom: 10px;
     }
     
     .header-subtitle {
         font-size: 13px;
-        color: #8C7A6B;
-        line-height: 1.5;
+        color: #D3C3B3;
+        letter-spacing: 1px;
+        font-weight: 300;
     }
     
-    .schedule-badge {
-        display: inline-block;
-        background: #F4EBE1;
-        color: #936B3C;
-        padding: 6px 14px;
-        border-radius: 30px;
-        font-size: 13px;
+    /* 狀態卡片區塊 */
+    .status-card-gold {
+        background: linear-gradient(145deg, rgba(42, 36, 30, 0.7) 0%, rgba(26, 22, 18, 0.85) 100%);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-radius: 14px;
+        padding: 14px 16px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .status-label {
+        font-size: 12px;
+        color: #A6917E;
+        margin-bottom: 4px;
+        letter-spacing: 1px;
+    }
+    .status-value {
+        font-size: 15px;
         font-weight: 600;
-        margin-top: 10px;
+        color: #F8E6C8;
     }
     
-    .story-card {
-        background: #FFFFFF;
+    /* 輸入框客製化 */
+    div[data-baseweb="textarea"] {
+        background-color: rgba(28, 25, 23, 0.8) !important;
+        border: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-radius: 14px !important;
+        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    }
+    div[data-baseweb="textarea"] textarea {
+        color: #F5ECE3 !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+    }
+    div[data-baseweb="textarea"]:focus-within {
+        border-color: #E8BE6B !important;
+        box-shadow: 0 0 12px rgba(232, 190, 107, 0.3) !important;
+    }
+    label[data-testid="stWidgetLabel"] p {
+        color: #E8D9CB !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    /* 尊榮黑金漸層按鈕 */
+    .stButton > button {
+        background: linear-gradient(135deg, #F0CF86 0%, #D4AF37 50%, #9E7422 100%) !important;
+        color: #1A1208 !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        letter-spacing: 2px !important;
+        border: none !important;
+        border-radius: 14px !important;
+        padding: 12px 24px !important;
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35) !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 25px rgba(232, 190, 107, 0.5) !important;
+        color: #0A0704 !important;
+    }
+    
+    /* 限動腳本尊貴名媛卡片 */
+    .story-card-luxury {
+        background: linear-gradient(160deg, rgba(34, 30, 26, 0.9) 0%, rgba(20, 18, 16, 0.95) 100%);
         border-radius: 16px;
-        padding: 18px;
-        margin-bottom: 16px;
-        border-left: 6px solid #C4A482;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
-        border-top: 1px solid #FAF6F0;
-        border-right: 1px solid #FAF6F0;
-        border-bottom: 1px solid #FAF6F0;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(212, 175, 55, 0.25);
+        border-left: 5px solid #D4AF37;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     
-    .card-top {
+    .card-meta-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
     
-    .story-num {
+    .badge-number {
+        font-family: 'Cinzel', serif;
         font-size: 12px;
         font-weight: 700;
-        color: #FFFFFF;
-        background: #3C332A;
-        padding: 3px 10px;
-        border-radius: 12px;
+        color: #1C1917;
+        background: linear-gradient(135deg, #FFF1D0 0%, #E8BE6B 100%);
+        padding: 3px 12px;
+        border-radius: 20px;
+        letter-spacing: 1px;
     }
     
-    .story-cat {
+    .badge-category {
         font-size: 12px;
         font-weight: 600;
-        color: #936B3C;
-        background: #FBF6EE;
-        padding: 3px 10px;
-        border-radius: 12px;
-        border: 1px solid #EEDDC9;
+        color: #E6CFA8;
+        background: rgba(212, 175, 55, 0.12);
+        padding: 3px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(212, 175, 55, 0.3);
     }
     
-    .hook-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #2B2621;
-        line-height: 1.55;
-        margin-bottom: 12px;
-        padding: 10px 12px;
-        background: #FAF7F2;
+    .luxury-hook-text {
+        font-size: 15px;
+        font-weight: 500;
+        color: #FFFFFF;
+        line-height: 1.6;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        background: rgba(14, 12, 10, 0.6);
         border-radius: 10px;
-        border: 1px dashed #E2D3C2;
+        border-left: 3px solid #E8BE6B;
     }
     
-    .meta-row {
+    .meta-line {
         font-size: 13px;
-        color: #554D45;
+        color: #C8B9A6;
         margin-bottom: 6px;
-        line-height: 1.45;
+        line-height: 1.5;
     }
-    
-    .meta-tag {
+    .meta-tag-gold {
+        color: #E8BE6B;
         font-weight: 600;
-        color: #936B3C;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -129,7 +203,7 @@ st.markdown("""
 class StoryItem(BaseModel):
     story_number: int = Field(description="第 1 到 9 篇限動順序")
     category: str = Field(description="分類：生活暖場/使用產品/客戶反饋/商品介紹/商品QA/生活放鬆/關於我/里程碑")
-    hook_copy: str = Field(description="適合直接複製到限動的口語化文案（像閨蜜聊天、真誠有感染力，45字以內）")
+    hook_copy: str = Field(description="口語、成熟優雅、像閨蜜聊天的精煉文案（45字以內，方便手機直接複製）")
     sticker_suggestion: str = Field(description="建議搭配的 IG 互動貼圖（如投票、表情滑桿、問答貼紙、私訊關鍵字等）")
     visual_guide: str = Field(description="建議配圖（如：今天拍的切蛋糕照片、做臉施作微距、魚缸小短片、客人好評對話截圖等）")
 
@@ -189,9 +263,11 @@ def generate_stories(day_idx: int, user_input: str) -> DailyStoryPlan:
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
-<div class="header-box">
-    <div class="header-title">👑 真真美學 ｜ 每日限動操盤助手</div>
-    <div class="header-subtitle">把生活瑣碎變成吸睛流量 · 讓專業悄悄變現</div>
+<div class="luxury-header">
+    <div class="brand-crown">👑</div>
+    <div class="header-title">真真美學 ｜ 每日限動操盤助手</div>
+    <div class="header-eng">ZHENZHEN AESTHETICS · STORY CURATOR</div>
+    <div class="header-subtitle">把生活瑣碎化為動人光彩 · 讓專業於無形中綻放</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -201,41 +277,58 @@ today_idx = now.isoweekday()
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    st.info(f"📅 **今天是 {day_map[today_idx]}**")
+    st.markdown(f"""
+    <div class="status-card-gold">
+        <div class="status-label">TODAY ｜ 當前排程</div>
+        <div class="status-value">📅 {day_map[today_idx]}</div>
+    </div>
+    """, unsafe_allow_html=True)
 with col2:
-    st.success(f"🎯 核心任務：**{'商品介紹' if today_idx % 2 == 1 else '商品QA'}** + **{'關於我' if today_idx % 2 == 1 else '里程碑'}**")
+    st.markdown(f"""
+    <div class="status-card-gold">
+        <div class="status-label">KEY FOCUS ｜ 今日重點</div>
+        <div class="status-value">✨ {'商品介紹' if today_idx % 2 == 1 else '商品QA'} ＋ {'關於我' if today_idx % 2 == 1 else '里程碑'}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
 
 user_thought = st.text_area(
-    "💬 今天有什麼日常、心情或客人對話？（隨興打一句就好）",
+    "💬 公主今天有什麼日常、心情或客人對話？（隨興打一句就好）",
     placeholder="例如：今天偷得半日閒去吃私房甜點切蛋糕，順道買了小魚小蝦回店裡放，下午客人做完深層淨膚直呼臉亮得像燈泡...",
-    height=100
+    height=95
 )
 
-col_btn, _ = st.columns([2, 1])
-with col_btn:
-    generate_btn = st.button("✨ 一鍵排好今天 9 格限動", type="primary", use_container_width=True)
+st.write("")
+
+generate_btn = st.button("✨ 一鍵排好今日 9 格限動腳本", use_container_width=True)
 
 if generate_btn:
     if not user_thought.strip():
-        st.warning("公主先隨興打一句今天的瑣事或心情吧～不用動腦隨便寫就好！")
+        st.warning("請先隨興打一句今天的瑣事或心情吧～不用動腦隨便寫就好！")
     else:
         with st.spinner("軍師正在為公主排定本日 9 則高轉化限動腳本..."):
             try:
                 plan = generate_stories(today_idx, user_thought)
-                st.markdown(f"### 🌟 本日主軸：{plan.day_theme}")
+                
+                st.markdown(f"""
+                <div style="margin: 20px 0 16px 0; padding: 12px 16px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.4); text-align: center;">
+                    <span style="color: #E8BE6B; font-size: 14px; font-weight: 600;">🌟 本日主軸定調：{plan.day_theme}</span>
+                </div>
+                """, unsafe_allow_html=True)
                 
                 for item in plan.stories:
                     st.markdown(f"""
-                    <div class="story-card">
-                        <div class="card-top">
-                            <span class="story-num">第 {item.story_number} 篇</span>
-                            <span class="story-cat">{item.category}</span>
+                    <div class="story-card-luxury">
+                        <div class="card-meta-bar">
+                            <span class="badge-number">STORY 0{item.story_number}</span>
+                            <span class="badge-category">{item.category}</span>
                         </div>
-                        <div class="hook-title">「{item.hook_copy}」</div>
-                        <div class="meta-row"><span class="meta-tag">📸 建議配圖：</span>{item.visual_guide}</div>
-                        <div class="meta-row"><span class="meta-tag">🏷️ 互動貼圖：</span>{item.sticker_suggestion}</div>
+                        <div class="luxury-hook-text">「{item.hook_copy}」</div>
+                        <div class="meta-line"><span class="meta-tag-gold">📸 建議配圖：</span>{item.visual_guide}</div>
+                        <div class="meta-line"><span class="meta-tag-gold">🏷️ 互動貼圖：</span>{item.sticker_suggestion}</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    st.code(item.hook_copy, language="text") # 提供一鍵複製按鈕
+                    st.code(item.hook_copy, language="text") # 手機端專屬快速複製
             except Exception as e:
                 st.error(f"生成出錯：{str(e)}")
