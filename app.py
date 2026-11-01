@@ -16,7 +16,7 @@ st.set_page_config(
 # 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 完美自適應、絕不折字破版)
 st.markdown("""
 <style>
-    @import url('[https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap](https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap)');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -199,23 +199,27 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 獲取 API 金鑰 (多重路徑保障) -----------------
+# ----------------- 獲取 API 金鑰 (自動清除多餘引號與括號) -----------------
 def get_api_key():
+    key = None
     try:
         if "GEMINI_API_KEY" in st.secrets:
-            return str(st.secrets["GEMINI_API_KEY"]).strip()
+            key = str(st.secrets["GEMINI_API_KEY"]).strip()
     except Exception:
         pass
-    val = os.environ.get("GEMINI_API_KEY")
-    if val:
-        return val.strip()
+    if not key:
+        val = os.environ.get("GEMINI_API_KEY")
+        if val:
+            key = val.strip()
+    if key:
+        return key.strip().strip("'\"[] ")
     return None
 
-# ----------------- 核心調用函數 (直連 HTTP 協定，超時放寬至 45 秒) -----------------
+# ----------------- 核心調用函數 (網址防呆清洗 + 純淨 JSON 提取) -----------------
 def generate_stories(day_idx: int, user_input: str):
     api_key = get_api_key()
     if not api_key:
-        raise ValueError("系統找不到 GEMINI_API_KEY，請確認 Streamlit App Settings -> Secrets 已正確填寫！")
+        raise ValueError("系統找不到 GEMINI_API_KEY，請確認 Streamlit App Settings -> Secrets 已設定！")
         
     qa_or_intro = "商品介紹" if day_idx % 2 == 1 else "商品QA"
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
@@ -240,7 +244,7 @@ def generate_stories(day_idx: int, user_input: str):
     真真的日常輸入：
     「{user_input}」
     
-    請以乾淨的純 JSON 格式輸出，不要包含任何 markdown 標記：
+    請以乾淨的純 JSON 格式輸出：
     {{
       "day_theme": "本日核心氛圍主題",
       "stories": [
@@ -255,7 +259,10 @@ def generate_stories(day_idx: int, user_input: str):
     }}
     """
     
-    url = f"[https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=){api_key}"
+    # 自動防呆過濾：移除開頭與結尾誤貼的任何括號、引號或空格
+    raw_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={api_key}"
+    clean_url = raw_url.strip().replace("[", "").replace("]", "").replace("'", "").replace('"', "")
+    
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -265,36 +272,36 @@ def generate_stories(day_idx: int, user_input: str):
     }
     
     req = urllib.request.Request(
-        url,
+        clean_url,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST"
     )
     
     try:
-        with urllib.request.urlopen(req, timeout=45) as response:
+        with urllib.request.urlopen(req, timeout=40) as response:
             result = json.loads(response.read().decode("utf-8"))
             if "candidates" not in result or not result["candidates"]:
-                err_feedback = result.get("promptFeedback", "模型未返回候選內容")
-                raise RuntimeError(f"API 無輸出內容：{err_feedback}")
+                raise RuntimeError("API 回傳結果為空，請稍後重試。")
                 
             content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
-            raw_text = content_text
-            if raw_text.startswith("```"):
-                lines = raw_text.split("\n")
-                if lines[0].startswith("```"):
-                    lines = lines[1:]
-                if lines and lines[-1].startswith("```"):
-                    lines = lines[:-1]
-                raw_text = "\n".join(lines).strip()
-            return json.loads(raw_text)
+            
+            # 精確抓取 JSON 起訖位置，避免任何外部雜訊干擾
+            start_idx = content_text.find("{")
+            end_idx = content_text.rfind("}")
+            if start_idx != -1 and end_idx != -1:
+                json_str = content_text[start_idx:end_idx+1]
+            else:
+                json_str = content_text
+                
+            return json.loads(json_str)
     except urllib.error.HTTPError as e:
         err_msg = e.read().decode('utf-8')
         raise RuntimeError(f"Google API 錯誤 ({e.code}): {err_msg}")
     except urllib.error.URLError as e:
-        raise RuntimeError(f"網路連線逾時或失敗: {str(e.reason)}")
+        raise RuntimeError(f"網路連線失敗: {str(e.reason)}")
     except Exception as e:
-        raise RuntimeError(f"系統處理異常: {str(e)}")
+        raise RuntimeError(f"處理異常: {str(e)}")
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
