@@ -1,9 +1,9 @@
 import os
 import json
+import urllib.request
+import urllib.error
 from datetime import datetime
 import streamlit as st
-from google import genai
-from google.genai import types
 
 # ----------------- 頁面與品牌配置 -----------------
 st.set_page_config(
@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 手機端專屬自適應、絕不折字破版)
+# 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 完美自適應)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
@@ -28,7 +28,6 @@ st.markdown("""
         color: #F5EBE1 !important;
     }
     
-    /* 頂部奢華 Header (針對 iPhone Pro Max 大螢幕自適應優化) */
     .luxury-header {
         text-align: center;
         padding: 24px 14px 20px 14px;
@@ -45,7 +44,6 @@ st.markdown("""
         filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
     }
     
-    /* 主標題：自適應字體大小，白金漸層，單行不爆字 */
     .header-title {
         font-family: 'Noto Serif TC', serif;
         font-size: clamp(16px, 4.6vw, 22px);
@@ -76,7 +74,6 @@ st.markdown("""
         line-height: 1.4;
     }
     
-    /* 狀態卡片區塊 */
     .status-card-gold {
         background: linear-gradient(145deg, rgba(42, 36, 30, 0.75) 0%, rgba(26, 22, 18, 0.9) 100%);
         border: 1px solid rgba(212, 175, 55, 0.28);
@@ -98,7 +95,6 @@ st.markdown("""
         color: #F8E6C8;
     }
     
-    /* 輸入框客製化 */
     div[data-baseweb="textarea"] {
         background-color: rgba(28, 25, 23, 0.85) !important;
         border: 1px solid rgba(212, 175, 55, 0.3) !important;
@@ -121,7 +117,6 @@ st.markdown("""
         letter-spacing: 0.3px !important;
     }
     
-    /* 尊榮黑金漸層按鈕 */
     .stButton > button {
         background: linear-gradient(135deg, #F0CF86 0%, #D4AF37 50%, #9E7422 100%) !important;
         color: #1A1208 !important;
@@ -140,7 +135,6 @@ st.markdown("""
         color: #0A0704 !important;
     }
     
-    /* 限動卡片 */
     .story-card-luxury {
         background: linear-gradient(160deg, rgba(34, 30, 26, 0.92) 0%, rgba(20, 18, 16, 0.98) 100%);
         border-radius: 16px;
@@ -199,15 +193,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 生成核心函數 (已鎖定 gemini-3.8-flash 與超快解析) -----------------
+# ----------------- 獲取 API 金鑰 (雙重相容) -----------------
+def get_api_key():
+    if "GEMINI_API_KEY" in st.secrets:
+        return st.secrets["GEMINI_API_KEY"]
+    if "GEMINI_API_KEY" in os.environ:
+        return os.environ["GEMINI_API_KEY"]
+    return None
+
+# ----------------- 核心調用函數 (直連 HTTP，絕不死鎖) -----------------
 def generate_stories(day_idx: int, user_input: str):
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = get_api_key()
     if not api_key:
-        st.error("⚠️ 請確認 Streamlit Secrets 已配置 GEMINI_API_KEY")
-        st.stop()
+        raise ValueError("系統找不到 GEMINI_API_KEY，請確認 Streamlit App Settings -> Secrets 已設定！")
         
-    client = genai.Client(api_key=api_key)
-    
     qa_or_intro = "商品介紹" if day_idx % 2 == 1 else "商品QA"
     about_or_milestone = "關於我" if day_idx % 2 == 1 else "里程碑"
     
@@ -231,7 +230,7 @@ def generate_stories(day_idx: int, user_input: str):
     真真的日常輸入：
     「{user_input}」
     
-    請以乾淨的純 JSON 格式輸出（不要加上 markdown 程式碼區塊標記），格式如下：
+    請以乾淨的純 JSON 格式輸出，不要包含任何 markdown 標記：
     {{
       "day_theme": "本日核心氛圍主題",
       "stories": [
@@ -246,20 +245,36 @@ def generate_stories(day_idx: int, user_input: str):
     }}
     """
     
-    response = client.models.generate_content(
-        model="gemini-3.8-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            temperature=0.7
-        )
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.7
+        }
+    }
+    
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST"
     )
-    raw_text = response.text.strip()
-    if raw_text.startswith("```json"):
-        raw_text = raw_text[7:]
-    if raw_text.endswith("```"):
-        raw_text = raw_text[:-3]
-    return json.loads(raw_text.strip())
+    
+    try:
+        with urllib.request.urlopen(req, timeout=15) as response:
+            result = json.loads(response.read().decode("utf-8"))
+            content_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+            if content_text.startswith("```json"):
+                content_text = content_text[7:]
+            if content_text.endswith("```"):
+                content_text = content_text[:-3]
+            return json.loads(content_text.strip())
+    except urllib.error.HTTPError as e:
+        err_msg = e.read().decode('utf-8')
+        raise RuntimeError(f"Google API 錯誤 ({e.code}): {err_msg}")
+    except Exception as e:
+        raise RuntimeError(f"連線失敗: {str(e)}")
 
 # ----------------- 介面與交互 -----------------
 st.markdown("""
@@ -331,4 +346,4 @@ if generate_btn:
                     """, unsafe_allow_html=True)
                     st.code(item.get('hook_copy', ''), language="text")
             except Exception as e:
-                st.error(f"生成出錯：{str(e)}")
+                st.error(f"❌ 執行中斷提示：{str(e)}")
