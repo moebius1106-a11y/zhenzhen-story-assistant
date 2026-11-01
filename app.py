@@ -48,7 +48,7 @@ st.markdown("""
     /* 主標題：自適應字體大小，白金漸層，單行不爆字 */
     .header-title {
         font-family: 'Noto Serif TC', serif;
-        font-size: clamp(17px, 4.8vw, 22px);
+        font-size: clamp(16px, 4.6vw, 22px);
         font-weight: 700;
         letter-spacing: 0.5px;
         white-space: nowrap;
@@ -61,7 +61,7 @@ st.markdown("""
     .header-eng {
         font-family: 'Cinzel', serif;
         font-size: clamp(9px, 2.5vw, 11px);
-        letter-spacing: 2.5px;
+        letter-spacing: 2px;
         color: #A3907F;
         text-transform: uppercase;
         margin-bottom: 8px;
@@ -199,7 +199,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 生成核心函數 (超速輕量 JSON 解析) -----------------
+# ----------------- 生成核心函數 (已鎖定 gemini-3.8-flash 與超快解析) -----------------
 def generate_stories(day_idx: int, user_input: str):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -247,7 +247,7 @@ def generate_stories(day_idx: int, user_input: str):
     """
     
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.8-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
