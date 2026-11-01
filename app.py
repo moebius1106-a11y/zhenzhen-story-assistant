@@ -206,7 +206,7 @@ def get_api_key():
         if val:
             key = val.strip()
     if key:
-        return key.strip().strip("'\"[] ")
+        return key.strip().strip("'"[] ")
     return None
 
 # ----------------- 核心調用函數 (精簡 Token + 極速秒出) -----------------
