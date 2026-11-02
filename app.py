@@ -24,47 +24,53 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 極致美業名媛高奢奶油白金風 CSS (iPhone 18 Pro Max 完美自適應、徹底根除反白看不見問題)
+# 極致真楨美學 (jj-glowskin.com) 純白高奢名媛風 CSS
+# 徹底覆寫 Streamlit 底層深色變數 (--secondary-background-color)，消滅所有黑色區塊 (#262730)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
     
-    :root {
+    :root, html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
         color-scheme: light !important;
+        --primary-color: #C89B4B !important;
+        --background-color: #FDFBF7 !important;
+        --secondary-background-color: #FFFFFF !important;
+        --text-color: #2C221E !important;
+        --font: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
 
     html, body, [class*="css"] {
         font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
         -webkit-font-smoothing: antialiased;
         color: #2C221E !important;
+        background-color: #FDFBF7 !important;
     }
     
-    /* 全域溫潤珍珠奶油白底色 */
-    .stApp {
-        background: linear-gradient(180deg, #FDFBF7 0%, #F7F2EA 100%) !important;
+    /* 全域溫潤珍珠白底色 */
+    .stApp, [data-testid="stAppViewContainer"] {
+        background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 50%, #F9F4EB 100%) !important;
         color: #2C221E !important;
     }
 
-    /* 頂部隱藏多餘裝飾但保留清爽空間 */
     header[data-testid="stHeader"] {
-        background: rgba(253, 251, 247, 0.85) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
     }
     
-    /* 頂部名媛白金奢華 Header */
+    /* 頂部真楨美學純白奢華 Header (iPhone 18 Pro Max 完美單行自適應) */
     .luxury-header {
         text-align: center;
         padding: 22px 14px 18px 14px;
-        background: linear-gradient(145deg, #FFFFFF 0%, #FAF5EC 100%);
+        background: #FFFFFF !important;
         border-radius: 20px;
-        border: 1.5px solid #DEC393;
-        box-shadow: 0 8px 24px rgba(158, 123, 62, 0.12), inset 0 1px 0 #FFFFFF;
+        border: 1.5px solid #E5D1B0;
+        box-shadow: 0 8px 26px rgba(180, 145, 85, 0.10);
         margin-bottom: 14px;
     }
     
     .brand-crown {
         font-size: 28px;
         margin-bottom: 4px;
-        filter: drop-shadow(0 2px 6px rgba(184, 138, 68, 0.35));
+        filter: drop-shadow(0 2px 6px rgba(200, 155, 75, 0.30));
     }
     
     .header-title {
@@ -91,22 +97,23 @@ st.markdown("""
     .header-subtitle {
         font-size: clamp(11.5px, 3.2vw, 13px);
         color: #8C6224 !important;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.4px;
         font-weight: 600;
         line-height: 1.45;
     }
 
-    /* 黃金邏輯橫幅 */
+    /* 黃金順序邏輯橫幅 */
     .logic-banner {
-        background: #FAF3E6;
-        border: 1px solid #DEC393;
+        background: #FFFFFF !important;
+        border: 1px solid #E5D1B0;
         border-radius: 12px;
         padding: 10px 12px;
         margin-bottom: 14px;
         font-size: 12px;
-        color: #523D24 !important;
+        color: #4A3722 !important;
         line-height: 1.55;
         text-align: center;
+        box-shadow: 0 2px 10px rgba(180, 145, 85, 0.06);
     }
 
     /* 9格與5格排程膠囊條 */
@@ -121,7 +128,7 @@ st.markdown("""
         font-size: 11px;
         padding: 4px 9px;
         border-radius: 8px;
-        background: #FFFFFF;
+        background: #FFFFFF !important;
         border: 1px solid #E2D5C1;
         color: #6E5A47 !important;
         font-weight: 500;
@@ -130,18 +137,18 @@ st.markdown("""
         font-size: 11px;
         padding: 4px 9px;
         border-radius: 8px;
-        background: #FDF3DF;
+        background: #FDF5E6 !important;
         border: 1px solid #C89B4B;
         color: #7A5114 !important;
         font-weight: 700;
     }
 
-    /* 徹底修復 Expander 展開與收合時的反白問題：固定溫潤白金底＋深褐字 */
+    /* 展開欄 Expander：純白底＋香檳金邊框，徹底解決反白看不見問題 */
     div[data-testid="stExpander"] {
         background: #FFFFFF !important;
-        border: 1px solid #E3D2B6 !important;
+        border: 1px solid #E5D1B0 !important;
         border-radius: 14px !important;
-        box-shadow: 0 3px 10px rgba(158, 123, 62, 0.06) !important;
+        box-shadow: 0 3px 12px rgba(180, 145, 85, 0.06) !important;
         margin-bottom: 10px !important;
         overflow: hidden !important;
     }
@@ -154,11 +161,11 @@ st.markdown("""
     div[data-testid="stExpander"] summary:focus,
     div[data-testid="stExpander"] summary:active,
     div[data-testid="stExpander"] details[open] > summary {
-        background: #FAF5EC !important;
+        background: #FCF8F0 !important;
         color: #4A3722 !important;
         padding: 11px 14px !important;
         border-radius: 13px !important;
-        border-bottom: 1px solid #EFE6D5 !important;
+        border-bottom: 1px solid #F0E6D6 !important;
     }
     div[data-testid="stExpander"] summary p,
     div[data-testid="stExpander"] summary span,
@@ -177,13 +184,13 @@ st.markdown("""
         padding: 12px 14px !important;
     }
 
-    /* 七天排程表專屬亮白金樣式 */
+    /* 七天排程表專屬純白金樣式 */
     .schedule-table-wrap {
         overflow-x: auto;
         margin: 6px 0 10px 0;
         border-radius: 12px;
         border: 1px solid #DEC393;
-        background: #FFFFFF;
+        background: #FFFFFF !important;
     }
     .schedule-table {
         width: 100%;
@@ -191,9 +198,10 @@ st.markdown("""
         font-size: 11px;
         text-align: center;
         min-width: 520px;
+        background: #FFFFFF !important;
     }
     .schedule-table th {
-        background: #F7EFE0;
+        background: #FAF3E4 !important;
         color: #6B4915 !important;
         padding: 7px 4px;
         font-weight: 700;
@@ -203,7 +211,7 @@ st.markdown("""
         padding: 6px 4px;
         border-bottom: 1px solid #F2ECE1;
         color: #5C4B3B !important;
-        background: #FFFFFF;
+        background: #FFFFFF !important;
     }
     .schedule-row-active td {
         background: #FEF6E6 !important;
@@ -213,96 +221,143 @@ st.markdown("""
         border-bottom: 1.5px solid #C89B4B !important;
     }
     .cell-work {
-        background: #FBF2E1 !important;
+        background: #FDF6E9 !important;
         color: #8A5D1A !important;
         font-weight: 700;
     }
     
-    /* 徹底修復下拉選單 Selectbox 與輸入框 Textarea 在手機端的配色與清晰度 */
+    /* 徹底消滅圖二所有黑色區塊 (#262730)：強制所有下拉選單與輸入框 100% 純白底＋深褐字 */
     label[data-testid="stWidgetLabel"] p {
         color: #4A3722 !important;
         font-size: 13.5px !important;
         font-weight: 700 !important;
     }
-    div[data-baseweb="select"] > div {
+    div[data-testid="stSelectbox"] > div,
+    div[data-baseweb="select"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] > div > div {
         background-color: #FFFFFF !important;
-        border: 1.2px solid #DEC393 !important;
-        border-radius: 12px !important;
+        background: #FFFFFF !important;
         color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+    }
+    div[data-baseweb="select"] > div {
+        border: 1.5px solid #DEC393 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px rgba(180, 145, 85, 0.06) !important;
     }
     div[data-baseweb="select"] span,
-    div[data-baseweb="select"] div {
+    div[data-baseweb="select"] div,
+    div[data-baseweb="select"] input {
         color: #2C221E !important;
-        font-weight: 500 !important;
+        -webkit-text-fill-color: #2C221E !important;
+        font-weight: 600 !important;
+        font-size: 15px !important;
     }
-    ul[data-baseweb="menu"],
-    div[data-baseweb="popover"] {
+    div[data-baseweb="select"] svg {
+        fill: #8C6224 !important;
+        color: #8C6224 !important;
+    }
+
+    /* 下拉選單彈出清單 (Popover Menu) 純白底深色字 */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
+    ul[data-baseweb="menu"] {
         background-color: #FFFFFF !important;
-        color: #2C221E !important;
+        background: #FFFFFF !important;
+        border: 1px solid #DEC393 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 24px rgba(140, 98, 36, 0.14) !important;
     }
     li[role="option"] {
         background-color: #FFFFFF !important;
         color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+        font-weight: 500 !important;
+    }
+    li[role="option"] span,
+    li[role="option"] div {
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
     }
     li[role="option"]:hover,
     li[aria-selected="true"] {
-        background-color: #FAF2E1 !important;
-        color: #6B4915 !important;
-        font-weight: 600 !important;
+        background-color: #FDF5E6 !important;
+        color: #7A5114 !important;
+        -webkit-text-fill-color: #7A5114 !important;
+        font-weight: 700 !important;
     }
 
-    /* 修復 Textarea 輸入框白底白字反白問題 */
-    div[data-baseweb="textarea"] {
+    /* 徹底修復圖二下方黑色打字區塊：穿透鎖定 base-input 與 textarea 為純白底 (#FFFFFF) */
+    div[data-testid="stTextArea"],
+    div[data-testid="stTextArea"] > div,
+    div[data-baseweb="textarea"],
+    div[data-baseweb="base-input"] {
         background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #2C221E !important;
+    }
+    div[data-baseweb="textarea"] {
         border: 1.5px solid #DEC393 !important;
         border-radius: 14px !important;
-        box-shadow: inset 0 1px 4px rgba(158, 123, 62, 0.08) !important;
+        box-shadow: 0 2px 10px rgba(180, 145, 85, 0.07) !important;
     }
-    div[data-baseweb="textarea"] textarea {
+    div[data-baseweb="textarea"]:focus-within {
+        border-color: #B8862D !important;
+        box-shadow: 0 0 0 2px rgba(200, 155, 75, 0.20) !important;
+    }
+    div[data-baseweb="textarea"] textarea,
+    div[data-baseweb="base-input"] textarea,
+    textarea {
         background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
         color: #2C221E !important;
         -webkit-text-fill-color: #2C221E !important;
         caret-color: #8C6224 !important;
-        font-size: 14.5px !important;
+        font-size: 16px !important; /* 16px 防止 iPhone Safari 點擊時自動放大畫面 */
         font-weight: 500 !important;
         line-height: 1.6 !important;
     }
-    div[data-baseweb="textarea"] textarea::placeholder {
+    div[data-baseweb="textarea"] textarea::placeholder,
+    textarea::placeholder {
         color: #9E8F7F !important;
         -webkit-text-fill-color: #9E8F7F !important;
         opacity: 1 !important;
     }
     
-    /* 尊榮香檳金按鈕 */
+    /* 真楨美學高雅白金按鈕與主題按鈕 */
     .stButton > button {
-        background: linear-gradient(135deg, #F3D999 0%, #D9AE56 55%, #B8862D 100%) !important;
-        color: #23180B !important;
+        background: linear-gradient(135deg, #F6E2B3 0%, #DFB867 55%, #C5953A 100%) !important;
+        color: #2C1E0B !important;
+        -webkit-text-fill-color: #2C1E0B !important;
         font-weight: 700 !important;
         font-size: 15px !important;
-        letter-spacing: 0.6px !important;
-        border: 1px solid #C59B47 !important;
+        letter-spacing: 0.5px !important;
+        border: 1px solid #C89B4B !important;
         border-radius: 14px !important;
         padding: 11px 16px !important;
-        box-shadow: 0 5px 15px rgba(184, 134, 45, 0.25) !important;
+        box-shadow: 0 4px 14px rgba(184, 134, 45, 0.20) !important;
     }
     .stButton > button p,
-    .stButton > button span {
-        color: #23180B !important;
+    .stButton > button span,
+    .stButton > button div {
+        color: #2C1E0B !important;
+        -webkit-text-fill-color: #2C1E0B !important;
         font-weight: 700 !important;
     }
     .stButton > button:active {
         transform: scale(0.98) !important;
     }
     
-    /* 限動腳本卡片：名媛珍珠白＋香檳金邊框 */
+    /* 限動腳本卡片：純白底＋香檳金左邊框 */
     .story-card-luxury {
-        background: #FFFFFF;
+        background: #FFFFFF !important;
         border-radius: 16px;
         padding: 16px 15px;
         margin-bottom: 12px;
-        border: 1px solid #E5D4B7;
+        border: 1px solid #E6D6BC;
         border-left: 5px solid #C89B4B;
-        box-shadow: 0 6px 18px rgba(158, 123, 62, 0.09);
+        box-shadow: 0 5px 18px rgba(158, 123, 62, 0.08);
     }
     .card-meta-bar {
         display: flex;
@@ -317,6 +372,7 @@ st.markdown("""
         font-size: 11px;
         font-weight: 700;
         color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
         background: linear-gradient(135deg, #C89B4B 0%, #9E7123 100%);
         padding: 3px 11px;
         border-radius: 20px;
@@ -324,7 +380,7 @@ st.markdown("""
     .badge-time {
         font-size: 11.5px;
         color: #6E5A47 !important;
-        background: #F6F1E9;
+        background: #F8F4EC !important;
         padding: 2px 9px;
         border-radius: 12px;
         font-weight: 600;
@@ -333,7 +389,7 @@ st.markdown("""
         font-size: 11.5px;
         font-weight: 700;
         color: #7A5114 !important;
-        background: #FDF3DF;
+        background: #FDF5E6 !important;
         padding: 2px 10px;
         border-radius: 20px;
         border: 1px solid #DEC393;
@@ -352,7 +408,7 @@ st.markdown("""
         line-height: 1.65;
         margin-bottom: 10px;
         padding: 12px 14px;
-        background: #FAF5EC;
+        background: #FCF9F2 !important;
         border-radius: 10px;
         border-left: 3.5px solid #C89B4B;
     }
@@ -369,7 +425,7 @@ st.markdown("""
     .highlight-box {
         margin-top: 8px;
         padding: 7px 11px;
-        background: #FDF8EE;
+        background: #FDF9F0 !important;
         border-radius: 8px;
         font-size: 12px;
         color: #7A5114 !important;
@@ -385,24 +441,29 @@ st.markdown("""
     /* 修復 Checkbox 打勾清單文字顏色 */
     div[data-testid="stCheckbox"] label span,
     div[data-testid="stCheckbox"] label p {
-        color: #3B2D20 !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
         font-weight: 500 !important;
     }
 
-    /* 一鍵複製程式碼區塊美化 */
+    /* 一鍵複製區塊：純白微米底＋深色字 */
+    div[data-testid="stCodeBlock"],
     div[data-testid="stCodeBlock"] pre {
-        background-color: #F7F2E9 !important;
-        border: 1px solid #E3D2B6 !important;
+        background-color: #FAF6EE !important;
+        background: #FAF6EE !important;
+        border: 1px solid #E5D1B0 !important;
         border-radius: 10px !important;
     }
-    div[data-testid="stCodeBlock"] code {
+    div[data-testid="stCodeBlock"] code,
+    div[data-testid="stCodeBlock"] span {
         color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
         font-weight: 500 !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# ----------------- 攻略資料庫 (100% 對齊兩張教材圖) -----------------
+# ----------------- 攻略資料庫 (100% 對齊圖三《賣貨版7天模板》與圖四《限動一頁式攻略》) -----------------
 OPENING_PATTERNS = {
     "自動依情境匹配最佳句型": "auto",
     "句型①：「有沒有人跟我一樣⋯⋯」＋投票": "有沒有人跟我一樣",
@@ -420,7 +481,7 @@ INTERACTION_HOOKS = {
     "抽卡（選 1、2、3，一個個回解讀）": "抽卡"
 }
 
-# 分離「日常情節」與「互動問句」，避免放進句型時雙重括號打架
+# 06 生活主題發想庫：看得到的日常 (8題)
 LIFE_TOPICS_VISIBLE = {
     "☀️ 早晨儀式": "今天起床第一件事就是泡杯溫水開啟美好的一天",
     "🍰 今天吃什麼": "原本想隨便吃，最後還是忍不住買了最愛的美食甜點",
@@ -432,6 +493,7 @@ LIFE_TOPICS_VISIBLE = {
     "🌿 週末小出遊": "趁著空檔偷得浮生半日閒出門晃晃透氣"
 }
 
+# 06 生活主題發想庫：看不到的想法 (8題)
 LIFE_TOPICS_THOUGHTS = {
     "🔋 今天的心情": "忙完一輪坐下來喝口咖啡，瞬間覺得電力滿滿",
     "💣 踩雷分享": "以前繳過好多保養冤枉錢，才懂成分跟手法有多重要",
@@ -443,7 +505,7 @@ LIFE_TOPICS_THOUGHTS = {
     "☕ 小確幸": "客人送了一杯超好喝的咖啡，心裡暖呼呼的"
 }
 
-# 對應圖三 06 生活主題發想庫的原版互動問句
+# 圖四 06 生活主題發想庫對應之原版問題
 TOPIC_QUESTIONS_MAP = {
     "☀️ 早晨儀式": "你們起床第一件事做什麼？",
     "🍰 今天吃什麼": "想吃 A 最後吃了 B 的舉手，你們今天吃什麼？",
@@ -479,20 +541,23 @@ def get_api_key() -> str:
         return key.strip().strip("'").strip('"')
     return ""
 
-# ----------------- 清理輸入文字（移除不小心附帶的括號問句，讓語句自然通順） -----------------
+# ----------------- 清理輸入文字（即使括號後多打字也能乾淨分離情節與問句） -----------------
 def sanitize_user_scenario(raw_input: str) -> tuple[str, str]:
-    text = raw_input.strip()
+    text = str(raw_input or "").strip()
     extracted_q = ""
-    # 若包含全形或半形括號問句，將其拆出作為結尾互動問句
-    if "（" in text and text.endswith("）"):
-        idx = text.rfind("（")
-        extracted_q = text[idx+1:-1].strip()
-        text = text[:idx].strip()
-    elif "(" in text and text.endswith(")"):
-        idx = text.rfind("(")
-        extracted_q = text[idx+1:-1].strip()
-        text = text[:idx].strip()
-    text = text.rstrip("。！!？?～~，,.")
+    if "（" in text and "）" in text:
+        idx1 = text.rfind("（")
+        idx2 = text.rfind("）")
+        if idx1 < idx2:
+            extracted_q = text[idx1+1:idx2].strip()
+            text = (text[:idx1] + " " + text[idx2+1:]).strip()
+    elif "(" in text and ")" in text:
+        idx1 = text.rfind("(")
+        idx2 = text.rfind(")")
+        if idx1 < idx2:
+            extracted_q = text[idx1+1:idx2].strip()
+            text = (text[:idx1] + " " + text[idx2+1:]).strip()
+    text = text.rstrip("。！!？?～~，,. ")
     if not text:
         text = "在工作室準備迎接預約的公主們，心情特別充實美好"
     return text, extracted_q
@@ -523,7 +588,7 @@ def build_opening_story(raw_input: str, opening_choice: str, v: int) -> tuple[st
         h2 = "接續剛剛說的暖心事～其實生活裡越簡單真誠的互動越讓人感動✨ 你們最近也有遇到讓你心頭一暖的小事嗎？"
     return h1, s1, h2
 
-# ----------------- 05 第二高點互動鉤子生成器 (支援全 6 種鉤子 × 奇偶日，無多餘中括號) -----------------
+# ----------------- 05 第二高點互動鉤子生成器 (支援全 6 種鉤子 × 奇偶日) -----------------
 def build_hook_story(hook_choice: str, is_odd: bool, is_recruit: bool, is_life_mode: bool = False) -> tuple[str, str, str]:
     h_type = INTERACTION_HOOKS.get(hook_choice, "幫我選")
     
@@ -583,7 +648,7 @@ def build_hook_story(hook_choice: str, is_odd: bool, is_recruit: bool, is_life_m
 
     return h5, v_guide, s5
 
-# ----------------- 內建「Peggy 攻略全精髓引擎」(100% 符合圖二與圖三規範) -----------------
+# ----------------- 內建「Peggy 攻略全精髓引擎」(100% 符合圖三與圖四規範) -----------------
 def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> dict:
     clean_in, _ = sanitize_user_scenario(user_input)
     is_odd = (day_idx % 2 == 1)
@@ -649,7 +714,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
             ]
         }
 
-    # 2. 賣貨版 / 招商版 (一天 9 篇三明治結構，嚴格對齊圖二 7 天模板)
+    # 2. 賣貨版 / 招商版 (一天 9 篇三明治結構，嚴格對齊圖三 7 天模板)
     is_recruit = ("招商" in mode)
     if is_recruit:
         cat3 = "團隊日常"
@@ -974,7 +1039,7 @@ def render_7day_schedule_table(active_day: int, mode: str) -> str:
         </table>
     </div>"""
 
-# ----------------- 介面頂部：白金奢華 Header -----------------
+# ----------------- 介面頂部：真楨美學純白金奢華 Header -----------------
 st.markdown("""
 <div class="luxury-header">
     <div class="brand-crown">👑</div>
@@ -1010,14 +1075,16 @@ with c_mode:
             "招商版（一天 9 篇｜團隊與事業魅力）",
             "生活版（一天 5 篇｜先連續發滿 7 天）"
         ],
-        index=0
+        index=0,
+        key="selected_mode"
     )
 with c_day:
     selected_day_idx = st.selectbox(
         f"📅 七天排程表（台灣時間：{now_taipei.strftime('%m/%d')} 週{['一','二','三','四','五','六','日'][today_auto_idx-1]}）",
         options=[1, 2, 3, 4, 5, 6, 7],
         format_func=lambda x: day_labels[x],
-        index=today_auto_idx - 1
+        index=today_auto_idx - 1,
+        key="selected_day_idx"
     )
 
 is_odd_day = (selected_day_idx % 2 == 1)
@@ -1063,13 +1130,15 @@ with col_op:
     opening_choice = st.selectbox(
         "🎯 04 第一篇開頭句型",
         list(OPENING_PATTERNS.keys()),
-        index=0
+        index=0,
+        key="opening_choice"
     )
 with col_hk:
     hook_choice = st.selectbox(
         "🪝 05 第二高點互動鉤子",
         list(INTERACTION_HOOKS.keys()),
-        index=0
+        index=0,
+        key="hook_choice"
     )
 
 # ----------------- Session State 初始化與 06 生活主題發想庫 Callback 連動 -----------------
@@ -1090,12 +1159,16 @@ def on_select_topic(topic_label: str, topic_text: str):
     full_seed_text = f"{topic_text}（{q_hint}）" if q_hint else topic_text
     st.session_state["draft_input"] = topic_text
     st.session_state["selected_topic_notice"] = f"✅ 已套用話題【{topic_label}】：「{topic_text}」，並為公主自動排好下方今日限動腳本！"
+    cur_mode = st.session_state.get("selected_mode", "賣貨版（一天 9 篇｜生活夾心賣貨）")
+    cur_day = int(st.session_state.get("selected_day_idx", today_auto_idx))
+    cur_op = st.session_state.get("opening_choice", "自動依情境匹配最佳句型")
+    cur_hk = st.session_state.get("hook_choice", "幫我選（A 還是 B？投票參與決定）")
     plan_res = peggy_master_engine(
-        selected_mode,
-        selected_day_idx,
+        cur_mode,
+        cur_day,
         full_seed_text,
-        opening_choice,
-        hook_choice,
+        cur_op,
+        cur_hk,
         st.session_state["seed_counter"]
     )
     st.session_state["story_plan"] = plan_res
@@ -1139,12 +1212,12 @@ with st.expander("💡 06 生活主題發想庫（不知道發什麼？點一下
 if st.session_state["selected_topic_notice"]:
     st.success(st.session_state["selected_topic_notice"])
 
-# ----------------- 日常輸入框 (深褐清晰字體，不反白) -----------------
+# ----------------- 日常輸入框 (純白底 #FFFFFF ＋ 深咖啡褐字 #2C221E，絕不黑底) -----------------
 user_thought = st.text_area(
     "💬 公主今天有什麼日常、心情或客人對話？（隨興打一句，或從上方 06 主題庫點選）",
     key="draft_input",
     placeholder="例如：客人送了一杯咖啡很好喝，心裡暖呼呼的...",
-    height=85
+    height=90
 )
 
 generate_btn = st.button("✨ 照攻略一鍵排好今日限動腳本（早埋伏筆＋晚給答案＋精選歸檔）", use_container_width=True)
@@ -1187,7 +1260,7 @@ if plan and isinstance(plan, dict):
 
     escaped_theme = html.escape(str(plan.get('day_theme', '')))
     st.markdown(f"""
-    <div style="margin: 6px 0 14px 0; padding: 11px 14px; background: #FDF8EE; border-radius: 12px; border: 1.5px dashed #C89B4B; text-align: center;">
+    <div style="margin: 6px 0 14px 0; padding: 11px 14px; background: #FFFFFF; border-radius: 12px; border: 1.5px dashed #C89B4B; text-align: center;">
         <span style="color: #6B4915; font-size: 13.5px; font-weight: 700;">🌟 {escaped_theme}</span>
     </div>
     """, unsafe_allow_html=True)
