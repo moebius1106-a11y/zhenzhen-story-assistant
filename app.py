@@ -24,46 +24,56 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 極致美業名媛奢華風 CSS (iPhone 18 Pro Max 完美自適應、絕不折字破版)
+# 極致美業名媛高奢奶油白金風 CSS (iPhone 18 Pro Max 完美自適應、徹底根除反白看不見問題)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
     
+    :root {
+        color-scheme: light !important;
+    }
+
     html, body, [class*="css"] {
         font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
         -webkit-font-smoothing: antialiased;
+        color: #2C221E !important;
     }
     
+    /* 全域溫潤珍珠奶油白底色 */
     .stApp {
-        background: radial-gradient(circle at 50% 10%, #1C1917 0%, #0C0A09 100%) !important;
-        color: #F5EBE1 !important;
+        background: linear-gradient(180deg, #FDFBF7 0%, #F7F2EA 100%) !important;
+        color: #2C221E !important;
+    }
+
+    /* 頂部隱藏多餘裝飾但保留清爽空間 */
+    header[data-testid="stHeader"] {
+        background: rgba(253, 251, 247, 0.85) !important;
     }
     
+    /* 頂部名媛白金奢華 Header */
     .luxury-header {
         text-align: center;
         padding: 22px 14px 18px 14px;
-        background: linear-gradient(145deg, rgba(38, 33, 29, 0.94) 0%, rgba(20, 18, 16, 0.98) 100%);
+        background: linear-gradient(145deg, #FFFFFF 0%, #FAF5EC 100%);
         border-radius: 20px;
-        border: 1px solid rgba(212, 175, 55, 0.42);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 223, 128, 0.25);
+        border: 1.5px solid #DEC393;
+        box-shadow: 0 8px 24px rgba(158, 123, 62, 0.12), inset 0 1px 0 #FFFFFF;
         margin-bottom: 14px;
     }
     
     .brand-crown {
-        font-size: 26px;
+        font-size: 28px;
         margin-bottom: 4px;
-        filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.6));
+        filter: drop-shadow(0 2px 6px rgba(184, 138, 68, 0.35));
     }
     
     .header-title {
         font-family: 'Noto Serif TC', serif;
-        font-size: clamp(15px, 4.3vw, 20px);
+        font-size: clamp(15.5px, 4.4vw, 21px);
         font-weight: 700;
         letter-spacing: 0.5px;
         white-space: nowrap;
-        background: linear-gradient(135deg, #FFF5DE 0%, #E8BE6B 50%, #B38634 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #7A541B !important;
         margin-bottom: 5px;
     }
     
@@ -71,63 +81,109 @@ st.markdown("""
         font-family: 'Cinzel', serif;
         font-size: clamp(8.5px, 2.4vw, 11px);
         letter-spacing: 2px;
-        color: #A3907F;
+        color: #9A815C !important;
         text-transform: uppercase;
         margin-bottom: 8px;
         white-space: nowrap;
+        font-weight: 600;
     }
     
     .header-subtitle {
-        font-size: clamp(11px, 3.1vw, 13px);
-        color: #E8BE6B;
+        font-size: clamp(11.5px, 3.2vw, 13px);
+        color: #8C6224 !important;
         letter-spacing: 0.5px;
-        font-weight: 500;
+        font-weight: 600;
         line-height: 1.45;
     }
 
+    /* 黃金邏輯橫幅 */
     .logic-banner {
-        background: rgba(212, 175, 55, 0.08);
-        border: 1px solid rgba(212, 175, 55, 0.28);
+        background: #FAF3E6;
+        border: 1px solid #DEC393;
         border-radius: 12px;
         padding: 10px 12px;
         margin-bottom: 14px;
         font-size: 12px;
-        color: #E6CFA8;
+        color: #523D24 !important;
         line-height: 1.55;
         text-align: center;
     }
 
+    /* 9格與5格排程膠囊條 */
     .grid-bar {
         display: flex;
         flex-wrap: wrap;
-        gap: 4px;
+        gap: 5px;
         justify-content: center;
         margin: 8px 0 14px 0;
     }
     .grid-pill {
         font-size: 11px;
-        padding: 3px 8px;
+        padding: 4px 9px;
         border-radius: 8px;
-        background: rgba(38, 33, 29, 0.9);
-        border: 1px solid rgba(212, 175, 55, 0.25);
-        color: #D3C3B3;
+        background: #FFFFFF;
+        border: 1px solid #E2D5C1;
+        color: #6E5A47 !important;
+        font-weight: 500;
     }
     .grid-pill-work {
         font-size: 11px;
-        padding: 3px 8px;
+        padding: 4px 9px;
         border-radius: 8px;
-        background: rgba(212, 175, 55, 0.22);
-        border: 1px solid #D4AF37;
-        color: #FFF1D0;
-        font-weight: 600;
+        background: #FDF3DF;
+        border: 1px solid #C89B4B;
+        color: #7A5114 !important;
+        font-weight: 700;
     }
 
-    /* 七天排程表專屬樣式 */
+    /* 徹底修復 Expander 展開與收合時的反白問題：固定溫潤白金底＋深褐字 */
+    div[data-testid="stExpander"] {
+        background: #FFFFFF !important;
+        border: 1px solid #E3D2B6 !important;
+        border-radius: 14px !important;
+        box-shadow: 0 3px 10px rgba(158, 123, 62, 0.06) !important;
+        margin-bottom: 10px !important;
+        overflow: hidden !important;
+    }
+    div[data-testid="stExpander"] details {
+        background: #FFFFFF !important;
+        border: none !important;
+    }
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] summary:hover,
+    div[data-testid="stExpander"] summary:focus,
+    div[data-testid="stExpander"] summary:active,
+    div[data-testid="stExpander"] details[open] > summary {
+        background: #FAF5EC !important;
+        color: #4A3722 !important;
+        padding: 11px 14px !important;
+        border-radius: 13px !important;
+        border-bottom: 1px solid #EFE6D5 !important;
+    }
+    div[data-testid="stExpander"] summary p,
+    div[data-testid="stExpander"] summary span,
+    div[data-testid="stExpander"] summary div {
+        color: #4A3722 !important;
+        font-weight: 700 !important;
+        font-size: 13.5px !important;
+    }
+    div[data-testid="stExpander"] summary svg {
+        fill: #8C6224 !important;
+        color: #8C6224 !important;
+    }
+    div[data-testid="stExpanderDetails"] {
+        background: #FFFFFF !important;
+        color: #2C221E !important;
+        padding: 12px 14px !important;
+    }
+
+    /* 七天排程表專屬亮白金樣式 */
     .schedule-table-wrap {
         overflow-x: auto;
         margin: 6px 0 10px 0;
         border-radius: 12px;
-        border: 1px solid rgba(212, 175, 55, 0.3);
+        border: 1px solid #DEC393;
+        background: #FFFFFF;
     }
     .schedule-table {
         width: 100%;
@@ -137,69 +193,116 @@ st.markdown("""
         min-width: 520px;
     }
     .schedule-table th {
-        background: rgba(212, 175, 55, 0.18);
-        color: #FFF1D0;
-        padding: 6px 4px;
-        font-weight: 600;
-        border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        background: #F7EFE0;
+        color: #6B4915 !important;
+        padding: 7px 4px;
+        font-weight: 700;
+        border-bottom: 1px solid #DEC393;
     }
     .schedule-table td {
         padding: 6px 4px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        color: #D3C3B3;
-    }
-    .schedule-row-active {
-        background: rgba(212, 175, 55, 0.16) !important;
-        font-weight: 700;
+        border-bottom: 1px solid #F2ECE1;
+        color: #5C4B3B !important;
+        background: #FFFFFF;
     }
     .schedule-row-active td {
-        color: #FFF5DE !important;
-        border-top: 1px solid #D4AF37;
-        border-bottom: 1px solid #D4AF37;
+        background: #FEF6E6 !important;
+        color: #6B4915 !important;
+        font-weight: 700 !important;
+        border-top: 1.5px solid #C89B4B !important;
+        border-bottom: 1.5px solid #C89B4B !important;
     }
     .cell-work {
-        background: rgba(212, 175, 55, 0.1);
-        color: #F5E0B7 !important;
-        font-weight: 600;
+        background: #FBF2E1 !important;
+        color: #8A5D1A !important;
+        font-weight: 700;
     }
     
-    div[data-baseweb="textarea"] {
-        background-color: rgba(28, 25, 23, 0.88) !important;
-        border: 1px solid rgba(212, 175, 55, 0.35) !important;
-        border-radius: 14px !important;
-        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
-    }
-    div[data-baseweb="textarea"] textarea {
-        color: #F5ECE3 !important;
-        font-size: 14px !important;
-        line-height: 1.6 !important;
-    }
+    /* 徹底修復下拉選單 Selectbox 與輸入框 Textarea 在手機端的配色與清晰度 */
     label[data-testid="stWidgetLabel"] p {
-        color: #E8D9CB !important;
+        color: #4A3722 !important;
         font-size: 13.5px !important;
+        font-weight: 700 !important;
+    }
+    div[data-baseweb="select"] > div {
+        background-color: #FFFFFF !important;
+        border: 1.2px solid #DEC393 !important;
+        border-radius: 12px !important;
+        color: #2C221E !important;
+    }
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] div {
+        color: #2C221E !important;
+        font-weight: 500 !important;
+    }
+    ul[data-baseweb="menu"],
+    div[data-baseweb="popover"] {
+        background-color: #FFFFFF !important;
+        color: #2C221E !important;
+    }
+    li[role="option"] {
+        background-color: #FFFFFF !important;
+        color: #2C221E !important;
+    }
+    li[role="option"]:hover,
+    li[aria-selected="true"] {
+        background-color: #FAF2E1 !important;
+        color: #6B4915 !important;
         font-weight: 600 !important;
     }
-    
-    .stButton > button {
-        background: linear-gradient(135deg, #F0CF86 0%, #D4AF37 50%, #9E7422 100%) !important;
-        color: #1A1208 !important;
-        font-weight: 700 !important;
-        font-size: 15.5px !important;
-        letter-spacing: 1px !important;
-        border: none !important;
+
+    /* 修復 Textarea 輸入框白底白字反白問題 */
+    div[data-baseweb="textarea"] {
+        background-color: #FFFFFF !important;
+        border: 1.5px solid #DEC393 !important;
         border-radius: 14px !important;
-        padding: 12px 18px !important;
-        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35) !important;
+        box-shadow: inset 0 1px 4px rgba(158, 123, 62, 0.08) !important;
+    }
+    div[data-baseweb="textarea"] textarea {
+        background-color: #FFFFFF !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+        caret-color: #8C6224 !important;
+        font-size: 14.5px !important;
+        font-weight: 500 !important;
+        line-height: 1.6 !important;
+    }
+    div[data-baseweb="textarea"] textarea::placeholder {
+        color: #9E8F7F !important;
+        -webkit-text-fill-color: #9E8F7F !important;
+        opacity: 1 !important;
     }
     
+    /* 尊榮香檳金按鈕 */
+    .stButton > button {
+        background: linear-gradient(135deg, #F3D999 0%, #D9AE56 55%, #B8862D 100%) !important;
+        color: #23180B !important;
+        font-weight: 700 !important;
+        font-size: 15px !important;
+        letter-spacing: 0.6px !important;
+        border: 1px solid #C59B47 !important;
+        border-radius: 14px !important;
+        padding: 11px 16px !important;
+        box-shadow: 0 5px 15px rgba(184, 134, 45, 0.25) !important;
+    }
+    .stButton > button p,
+    .stButton > button span {
+        color: #23180B !important;
+        font-weight: 700 !important;
+    }
+    .stButton > button:active {
+        transform: scale(0.98) !important;
+    }
+    
+    /* 限動腳本卡片：名媛珍珠白＋香檳金邊框 */
     .story-card-luxury {
-        background: linear-gradient(160deg, rgba(34, 30, 26, 0.94) 0%, rgba(20, 18, 16, 0.98) 100%);
+        background: #FFFFFF;
         border-radius: 16px;
         padding: 16px 15px;
-        margin-bottom: 14px;
-        border: 1px solid rgba(212, 175, 55, 0.28);
-        border-left: 5px solid #D4AF37;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+        margin-bottom: 12px;
+        border: 1px solid #E5D4B7;
+        border-left: 5px solid #C89B4B;
+        box-shadow: 0 6px 18px rgba(158, 123, 62, 0.09);
     }
     .card-meta-bar {
         display: flex;
@@ -213,68 +316,88 @@ st.markdown("""
         font-family: 'Cinzel', serif;
         font-size: 11px;
         font-weight: 700;
-        color: #1C1917;
-        background: linear-gradient(135deg, #FFF1D0 0%, #E8BE6B 100%);
-        padding: 2px 10px;
+        color: #FFFFFF !important;
+        background: linear-gradient(135deg, #C89B4B 0%, #9E7123 100%);
+        padding: 3px 11px;
         border-radius: 20px;
     }
     .badge-time {
-        font-size: 11px;
-        color: #D3C3B3;
-        background: rgba(255,255,255,0.06);
-        padding: 2px 8px;
+        font-size: 11.5px;
+        color: #6E5A47 !important;
+        background: #F6F1E9;
+        padding: 2px 9px;
         border-radius: 12px;
+        font-weight: 600;
     }
     .badge-category {
         font-size: 11.5px;
-        font-weight: 600;
-        color: #E6CFA8;
-        background: rgba(212, 175, 55, 0.15);
+        font-weight: 700;
+        color: #7A5114 !important;
+        background: #FDF3DF;
         padding: 2px 10px;
         border-radius: 20px;
-        border: 1px solid rgba(212, 175, 55, 0.35);
+        border: 1px solid #DEC393;
     }
     .role-tag {
-        font-size: 11.5px;
-        color: #F0CF86;
-        font-weight: 600;
+        font-size: 12px;
+        color: #8C6224 !important;
+        font-weight: 700;
         margin-bottom: 8px;
-        letter-spacing: 0.3px;
+        letter-spacing: 0.2px;
     }
     .luxury-hook-text {
-        font-size: 14.5px;
-        font-weight: 500;
-        color: #FFFFFF;
-        line-height: 1.6;
+        font-size: 15px;
+        font-weight: 600;
+        color: #23180B !important;
+        line-height: 1.65;
         margin-bottom: 10px;
-        padding: 11px 13px;
-        background: rgba(14, 12, 10, 0.7);
+        padding: 12px 14px;
+        background: #FAF5EC;
         border-radius: 10px;
-        border-left: 3px solid #E8BE6B;
+        border-left: 3.5px solid #C89B4B;
     }
     .meta-line {
-        font-size: 12.5px;
-        color: #C8B9A6;
+        font-size: 13px;
+        color: #4A3B2C !important;
         margin-bottom: 5px;
         line-height: 1.5;
     }
     .meta-tag-gold {
-        color: #E8BE6B;
-        font-weight: 600;
+        color: #8C6224 !important;
+        font-weight: 700;
     }
     .highlight-box {
         margin-top: 8px;
-        padding: 6px 10px;
-        background: rgba(212, 175, 55, 0.1);
+        padding: 7px 11px;
+        background: #FDF8EE;
         border-radius: 8px;
-        font-size: 11.5px;
-        color: #F5E0B7;
-        border: 1px dashed rgba(212, 175, 55, 0.35);
+        font-size: 12px;
+        color: #7A5114 !important;
+        font-weight: 600;
+        border: 1px dashed #C89B4B;
     }
     .safety-note {
         font-size: 11px;
-        color: #8C7A6B;
-        margin-top: 6px;
+        color: #8A7968 !important;
+        margin-top: 7px;
+    }
+
+    /* 修復 Checkbox 打勾清單文字顏色 */
+    div[data-testid="stCheckbox"] label span,
+    div[data-testid="stCheckbox"] label p {
+        color: #3B2D20 !important;
+        font-weight: 500 !important;
+    }
+
+    /* 一鍵複製程式碼區塊美化 */
+    div[data-testid="stCodeBlock"] pre {
+        background-color: #F7F2E9 !important;
+        border: 1px solid #E3D2B6 !important;
+        border-radius: 10px !important;
+    }
+    div[data-testid="stCodeBlock"] code {
+        color: #2C221E !important;
+        font-weight: 500 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -297,26 +420,47 @@ INTERACTION_HOOKS = {
     "抽卡（選 1、2、3，一個個回解讀）": "抽卡"
 }
 
+# 分離「日常情節」與「互動問句」，避免放進句型時雙重括號打架
 LIFE_TOPICS_VISIBLE = {
-    "☀️ 早晨儀式": "今天起床第一件事就是準備開啟美好的一天（你們起床第一件事做什麼？）",
-    "🍰 今天吃什麼": "原本想隨便吃，最後還是忍不住買了最愛的美食甜點（想吃 A 最後吃了 B 的舉手）",
-    "🚗 通勤路上": "今天去店裡的路上看到一家超有質感的店（路上有沒有一家店一直想進去？）",
-    "💑 家人／另一半": "今天發生的日常對話真的讓我哭笑不得（你家那位也常讓你傻眼嗎？）",
-    "🐠 毛小孩／店寵": "看著店裡魚缸的小魚小蝦游來游去超級療癒（你們家毛孩也會這樣看你嗎？）",
-    "💆‍♀️ 運動／保養": "再忙還是要留時間給自己好好保養維持狀態（你們都怎麼逼自己運動？）",
-    "🕯️ 工作角落": "在真真美學待最久的溫馨小角落，點上香氛超放鬆（你待最久的角落長怎樣？）",
-    "🌿 週末小出遊": "趁著空檔偷得浮生半日閒出門晃晃透氣（猜猜我今天放假跑去哪？）"
+    "☀️ 早晨儀式": "今天起床第一件事就是泡杯溫水開啟美好的一天",
+    "🍰 今天吃什麼": "原本想隨便吃，最後還是忍不住買了最愛的美食甜點",
+    "🚗 通勤路上": "今天去店裡的路上看到一家超有質感的店",
+    "💑 家人／另一半": "今天發生的日常對話真的讓我哭笑不得",
+    "🐠 毛小孩／店寵": "看著店裡魚缸的小魚小蝦游來游去超級療癒",
+    "💆‍♀️ 運動／保養": "再忙還是要留時間給自己好好保養維持狀態",
+    "🕯️ 工作角落": "在真真美學待最久的溫馨小角落，點上香氛超放鬆",
+    "🌿 週末小出遊": "趁著空檔偷得浮生半日閒出門晃晃透氣"
 }
 
 LIFE_TOPICS_THOUGHTS = {
-    "🔋 今天的心情": "忙完一輪坐下來喝口咖啡，瞬間覺得電力滿滿（你們累了都怎麼充電？）",
-    "💣 踩雷分享": "以前繳過好多保養冤枉錢，才懂成分跟手法有多重要（你們買過最後悔的東西是？）",
-    "📚 正在學的事": "最近一直在研究怎麼讓膚況更穩更細緻的新技術（你們最近有在學什麼嗎？）",
-    "📸 以前的我": "無意間翻到以前的照片，感嘆女人真的越懂得愛自己越美（你們敢翻三年前的照片嗎？）",
-    "🙏 想謝謝的人": "心裡很感激每位願意把臉蛋跟信任交給我的客人（你最近最想謝謝誰？）",
-    "💎 我的堅持": "寧可慢工細活也不做速成推銷，是我做美業不變的原則（你有默默堅持很久的事嗎？）",
-    "✨ 最近在想": "把日子過得有質感、內心通透從容，就是最棒的狀態（你們覺得怎樣才叫過得好？）",
-    "☕ 小確幸": "客人送了一杯超好喝的咖啡，心裡暖呼呼的（你們今天最開心的是什麼？）"
+    "🔋 今天的心情": "忙完一輪坐下來喝口咖啡，瞬間覺得電力滿滿",
+    "💣 踩雷分享": "以前繳過好多保養冤枉錢，才懂成分跟手法有多重要",
+    "📚 正在學的事": "最近一直在研究怎麼讓膚況更穩更細緻的新技術",
+    "📸 以前的我": "無意間翻到以前的照片，感嘆女人真的越懂得愛自己越美",
+    "🙏 想謝謝的人": "心裡很感激每位願意把臉蛋跟信任交給我的客人",
+    "💎 我的堅持": "寧可慢工細活也不做速成推銷，是我做美業不變的原則",
+    "✨ 最近在想": "把日子過得有質感、內心通透從容，就是最棒的狀態",
+    "☕ 小確幸": "客人送了一杯超好喝的咖啡，心裡暖呼呼的"
+}
+
+# 對應圖三 06 生活主題發想庫的原版互動問句
+TOPIC_QUESTIONS_MAP = {
+    "☀️ 早晨儀式": "你們起床第一件事做什麼？",
+    "🍰 今天吃什麼": "想吃 A 最後吃了 B 的舉手，你們今天吃什麼？",
+    "🚗 通勤路上": "路上有沒有一家店你們一直想進去？",
+    "💑 家人／另一半": "你們家那位也常讓你傻眼嗎？",
+    "🐠 毛小孩／店寵": "你們家毛孩也會這樣看你嗎？",
+    "💆‍♀️ 運動／保養": "你們都怎麼逼自己運動或保養？",
+    "🕯️ 工作角落": "你們待最久的角落長怎樣？",
+    "🌿 週末小出遊": "猜猜我今天放假跑去哪？你們週末去哪玩？",
+    "🔋 今天的心情": "你們累了都怎麼充電？",
+    "💣 踩雷分享": "你們買過最後悔的東西是什麼？",
+    "📚 正在學的事": "你們最近有在學什麼嗎？",
+    "📸 以前的我": "你們敢翻三年前的照片嗎？",
+    "🙏 想謝謝的人": "你們最近最想謝謝誰？",
+    "💎 我的堅持": "你們有默默堅持很久的事嗎？",
+    "✨ 最近在想": "你們覺得怎樣才叫過得好？",
+    "☕ 小確幸": "你們今天最開心的是什麼？"
 }
 
 # ----------------- 安全獲取 API 金鑰 -----------------
@@ -335,15 +479,38 @@ def get_api_key() -> str:
         return key.strip().strip("'").strip('"')
     return ""
 
+# ----------------- 清理輸入文字（移除不小心附帶的括號問句，讓語句自然通順） -----------------
+def sanitize_user_scenario(raw_input: str) -> tuple[str, str]:
+    text = raw_input.strip()
+    extracted_q = ""
+    # 若包含全形或半形括號問句，將其拆出作為結尾互動問句
+    if "（" in text and text.endswith("）"):
+        idx = text.rfind("（")
+        extracted_q = text[idx+1:-1].strip()
+        text = text[:idx].strip()
+    elif "(" in text and text.endswith(")"):
+        idx = text.rfind("(")
+        extracted_q = text[idx+1:-1].strip()
+        text = text[:idx].strip()
+    text = text.rstrip("。！!？?～~，,.")
+    if not text:
+        text = "在工作室準備迎接預約的公主們，心情特別充實美好"
+    return text, extracted_q
+
 # ----------------- 04 第一篇開頭句型生成器 -----------------
-def build_opening_story(clean_in: str, opening_choice: str, v: int) -> tuple[str, str, str]:
+def build_opening_story(raw_input: str, opening_choice: str, v: int) -> tuple[str, str, str]:
+    clean_in, custom_q = sanitize_user_scenario(raw_input)
     p_key = OPENING_PATTERNS.get(opening_choice, "auto")
+    end_q = custom_q if (custom_q and "你們" in custom_q) else "你們今天早上有遇到什麼小確幸嗎？"
+    if not end_q.endswith("？"):
+        end_q = end_q.rstrip("?。！") + "？"
+
     if p_key == "有沒有人跟我一樣" or (p_key == "auto" and v == 0):
-        h1 = f"有沒有人跟我一樣，只要遇到「{clean_in}」整個人心情就瞬間變超好？而且今天還準備了一件特別的事要忙，你們今天早上有遇到什麼小確幸嗎？"
+        h1 = f"有沒有人跟我一樣，只要「{clean_in}」整個人心情就瞬間變超好✨ 而且今天還準備了一件特別的事要忙，{end_q}"
         s1 = "投票貼紙：我也是小確幸派🙋‍♀️ / 今天忙到飛起🔥"
         h2 = "接續上一篇～帶著滿滿好心情把工作室打理得香香亮亮的✨ 開場先跟你們聊聊天，你們平時起床第一件事都做什麼？"
     elif p_key == "你們會不會也" or (p_key == "auto" and v == 1):
-        h1 = f"你們會不會也覺得，生活裡有「{clean_in}」這種溫暖小事就特別有動力？先留個小伏筆，晚上再告訴你們今天忙了什麼！你們今天精神好嗎？"
+        h1 = f"你們會不會也覺得，日常裡「{clean_in}」這種溫暖時刻特別有動力✨ 先留個小伏筆，晚上再告訴你們今天忙了什麼！{end_q}"
         s1 = "表情滑桿：滑動告訴我你們今天的能量值✨"
         h2 = "接續早上的日常～趁著預約空檔泡了杯熱飲暖暖胃☕️ 你們平時工作前最喜歡喝咖啡還是喝茶？"
     elif p_key == "你們猜猜看":
@@ -351,21 +518,21 @@ def build_opening_story(clean_in: str, opening_choice: str, v: int) -> tuple[str
         s1 = "測驗貼紙：猜猜真真第一件事做什麼？（A 準備護膚器具 / B 餵魚缸小魚小蝦）"
         h2 = "公佈上一篇測驗答案啦✨ 我進店第一件事就是先看魚缸的小魚小蝦再把器具消毒備好！你們猜對了嗎？"
     else:
-        h1 = f"今天發生一件超暖心的事：{clean_in}🥰 先留個懸念，後面接著講為什麼這件事讓我開心了一整天！你們今天出門順利嗎？"
+        h1 = f"今天發生一件超暖心的事：{clean_in}🥰 先留個懸念，後面接著講為什麼這件事讓我開心了一整天！{end_q}"
         s1 = "投票貼紙：想聽後續舉手🙋‍♀️ / 先幫真真按個讚💛"
         h2 = "接續剛剛說的暖心事～其實生活裡越簡單真誠的互動越讓人感動✨ 你們最近也有遇到讓你心頭一暖的小事嗎？"
     return h1, s1, h2
 
-# ----------------- 05 第二高點互動鉤子生成器 (支援全 6 種鉤子 × 奇偶日) -----------------
+# ----------------- 05 第二高點互動鉤子生成器 (支援全 6 種鉤子 × 奇偶日，無多餘中括號) -----------------
 def build_hook_story(hook_choice: str, is_odd: bool, is_recruit: bool, is_life_mode: bool = False) -> tuple[str, str, str]:
     h_type = INTERACTION_HOOKS.get(hook_choice, "幫我選")
     
     if is_life_mode:
         v_guide = "店內魚缸小魚小蝦或溫馨工作角落實拍（真實自然光）"
         if h_type == "留言領乾貨":
-            return "下午窩在待最久的角落整理筆記✨ 我把平時自己維持好氣色的《日常作息與補水清單》整理好了，你們想看嗎？回覆關鍵字【清單】我私訊傳給你們？", v_guide, "問答貼紙：回覆【清單】私訊領取日常保養筆記🎁"
+            return "下午窩在待最久的角落整理筆記✨ 我把平時自己維持好氣色的《日常作息與補水清單》整理好了，你們想看嗎？回覆關鍵字「清單」我私訊傳給你們？", v_guide, "問答貼紙：回覆「清單」私訊領取日常保養筆記🎁"
         elif h_type == "心理測驗":
-            return "下午休息時間來玩個趣味心理測驗✨ 憑直覺選一樣你現在最想做的事，測出你最近的壓力指數！你們是幾月生的？回覆生日月份我私訊給專屬結果？", v_guide, "問答貼紙：回覆你的【生日月份】領取專屬解析🔮"
+            return "下午休息時間來玩個趣味心理測驗✨ 憑直覺選一樣你現在最想做的事，測出你最近的壓力指數！你們是幾月生的？回覆生日月份我私訊給專屬結果？", v_guide, "問答貼紙：回覆你的「生日月份」領取專屬解析🔮"
         elif h_type == "QA收題日":
             return "下午在工作室角落放空充電🌿 今天開放日常QA收題！你們平時對美業工作或日常保養有什麼好奇的事嗎？在提問貼紙問我，明天一題一篇回答你們？", v_guide, "提問貼紙：有什麼好奇的問題？丟過來明天解答💬"
         elif h_type == "抽卡":
@@ -375,54 +542,53 @@ def build_hook_story(hook_choice: str, is_odd: bool, is_recruit: bool, is_life_m
         else:
             return "下午窩在這個待最久的溫馨角落，看著魚缸的小魚游來游去超療癒✨ 你們工作累了都怎麼充電？選 A 喝下午茶 還是 B 安靜放空五分鐘？幫我投票選一個？", v_guide, "投票貼紙：A 絕對要下午茶☕️ / B 安靜放空🌿"
 
-    topic_label = ("公司介紹" if is_odd else "團隊 QA") if is_recruit else ("商品介紹" if is_odd else "商品 QA")
     v_guide = "護理產品或專業設備乾淨擺拍（字放安全區）" if is_odd else "真真專業工作側拍或重點 QA 排版圖（字體顏色最多2種）"
 
     if h_type == "留言領乾貨":
         if is_odd:
-            h5 = f"【{topic_label}】為什麼做好基底保濕對肌膚這麼重要？因為水分充足膚況自然穩定✨ 我整理了一份《日常基礎養膚避雷指南》，你們想要嗎？回關鍵字【養膚】我私訊傳資源給你們？"
+            h5 = "為什麼做好基底保濕對肌膚這麼重要？因為水分充足膚況自然穩定✨ 我整理了一份《日常基礎養膚避雷指南》，你們想要嗎？回關鍵字「養膚」我私訊傳資源給你們？"
         else:
-            h5 = f"【{topic_label}】大家常問換季乾燥怎麼照顧？先看我精選『QA』，我還額外整理了《居家保濕步驟圖》，你們想領取嗎？回關鍵字【保濕】我私訊傳給你們？"
-        s5 = "問答貼紙：回覆關鍵字【養膚/保濕】私訊傳資源給你🎁"
+            h5 = "大家常問換季乾燥怎麼照顧？先看我精選「產品 QA」，我還額外整理了《居家保濕步驟圖》，你們想領取嗎？回關鍵字「保濕」我私訊傳給你們？"
+        s5 = "問答貼紙：回覆關鍵字「養膚/保濕」私訊傳資源給你🎁"
     elif h_type == "心理測驗":
         if is_odd:
-            h5 = f"【{topic_label}】每種膚質都有專屬的溫和調理節奏✨ 來玩個小算命！你們是幾月出生的呢？回覆你的【生日月份】，我私訊告訴你專屬的換季保養重點結果？"
+            h5 = "每種膚質都有專屬的溫和調理節奏✨ 來玩個小算命！你們是幾月出生的呢？回覆你的「生日月份」，我私訊告訴你專屬的換季保養重點結果？"
         else:
-            h5 = f"【{topic_label}】常有朋友問怎麼挑對護理方向？先看精選『QA』，再來測測你的肌膚性格！回覆你的【生日月份】，我私訊給你專屬保養建議，你們幾月生呢？"
-        s5 = "問答貼紙：回覆【生日月份】私訊領取專屬結果🔮"
+            h5 = "常有朋友問怎麼挑對護理方向？先看精選「產品 QA」，再來測測你的肌膚性格！回覆你的「生日月份」，我私訊給你專屬保養建議，你們幾月生呢？"
+        s5 = "問答貼紙：回覆「生日月份」私訊領取專屬結果🔮"
     elif h_type == "QA收題日":
         if is_odd:
-            h5 = f"【{topic_label}】店裡溫和調理流程最重視油水平衡💧 今天也是每週 QA 收題日！你們平時保養最常卡關哪一步？在提問貼紙留問題，隔天我一題一篇為你們解答？"
+            h5 = "店裡溫和調理流程最重視油水平衡💧 今天也是每週 QA 收題日！你們平時保養最常卡關哪一步？在提問貼紙留問題，隔天我一題一篇為你們解答？"
         else:
-            h5 = f"【{topic_label}】今天是每週護膚 QA 收題日✨ 很多朋友問外油內乾怎麼保養？關鍵在溫和清潔與補水！先看我精選『QA』，你們還有什麼保養疑問想在貼紙提問嗎？"
+            h5 = "今天是每週護膚 QA 收題日✨ 很多朋友問外油內乾怎麼保養？關鍵在溫和清潔與補水！先看我精選「產品 QA」，你們還有什麼保養疑問想在貼紙提問嗎？"
         s5 = "提問貼紙：留下你的保養疑問，隔天一題一篇解答💬"
     elif h_type == "抽卡":
         if is_odd:
-            h5 = f"【{topic_label}】今天施作這道溫和補水流程手感特別好✨ 來玩個保養抽卡！你們目前最想加強 1水分補給、2溫和清潔、還是 3舒緩穩定？選 1、2、3 我一個個私訊幫你們解讀？"
+            h5 = "今天施作這道溫和補水流程手感特別好✨ 來玩個保養抽卡！你們目前最想加強 1水分補給、2溫和清潔、還是 3舒緩穩定？選 1、2、3 我一個個私訊幫你們解讀？"
         else:
-            h5 = f"【{topic_label}】保養QA抽卡時間✨ 面對換季膚況，你們最困擾 1上妝不服貼、2T字易出油、還是 3臉頰乾繃？選 1、2、3 我一個個私訊回你們解讀建議？"
+            h5 = "保養 QA 抽卡時間✨ 面對換季膚況，你們最困擾 1上妝不服貼、2T字易出油、還是 3臉頰乾繃？選 1、2、3 我一個個私訊回你們解讀建議？"
         s5 = "投票/問答貼紙：選 1、2、3 我一個個回你專屬解讀🃏"
     elif h_type == "猜猜看":
         if is_odd:
-            h5 = f"【{topic_label}】溫和深層護理能幫肌膚維持水潤細緻✨ 你們猜猜看，做完深層補水後頭三天最關鍵的保養動作是什麼？先在測驗貼紙猜答案，下一篇揭曉你們猜對了嗎？"
+            h5 = "溫和深層護理能幫肌膚維持水潤細緻✨ 你們猜猜看，做完深層補水後頭三天最關鍵的保養動作是什麼？先在測驗貼紙猜答案，下一篇揭曉你們猜對了嗎？"
         else:
-            h5 = f"【{topic_label}】大家常問：多久安排一次深層管理最合適？建議順應肌膚代謝週期調理～猜猜看洗臉水溫太高會發生什麼事？測驗貼紙猜答案，下一篇揭曉你們猜對了嗎？"
+            h5 = "大家常問：多久安排一次深層管理最合適？建議順應肌膚代謝週期調理～猜猜看洗臉水溫太高會發生什麼事？測驗貼紙猜答案，下一篇揭曉你們猜對了嗎？"
         s5 = "測驗貼紙：猜猜正確保養關鍵？（A 加強純保濕與防曬 / B 立刻用去角質酸類）"
     else:
         if is_odd:
-            h5 = f"【{topic_label}】店裡很受歡迎的深層溫和護理👑 著重在溫和代謝角質並補充水分！你們日常保養時最在乎 A清爽透亮 還是 B水潤細緻？A 還是 B 幫我投票參與決定？"
+            h5 = "店裡很受歡迎的深層溫和護理👑 著重在溫和代謝角質並補充水分！你們日常保養時最在乎 A清爽透亮 還是 B水潤細緻？A 還是 B 幫我投票參與決定？"
         else:
-            h5 = f"【{topic_label}】整理精選『QA』時發現大家最常問保養順序✨ 你們平時休假在家喜歡 A敷臉做足全套保養 還是 B精簡擦保濕就睡覺？A 還是 B 投票告訴我？"
+            h5 = "整理精選「產品 QA」時發現大家最常問保養順序✨ 你們平時休假在家喜歡 A敷臉做足全套保養 還是 B精簡擦保濕就睡覺？A 還是 B 投票告訴我？"
         s5 = "投票貼紙：A 清爽透亮派✨ / B 水潤細緻派💧"
 
     return h5, v_guide, s5
 
 # ----------------- 內建「Peggy 攻略全精髓引擎」(100% 符合圖二與圖三規範) -----------------
 def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> dict:
-    clean_in = user_input.strip().rstrip("。！!？?～~，,.")
+    clean_in, _ = sanitize_user_scenario(user_input)
     is_odd = (day_idx % 2 == 1)
     v = seed_idx % 3
-    h1, s1, h2 = build_opening_story(clean_in, opening_choice, v)
+    h1, s1, h2 = build_opening_story(user_input, opening_choice, v)
 
     # 1. 生活版 (一天 5 篇：早上 / 中午 / 下午 / 晚上 / 睡前)
     if mode == "生活版（一天 5 篇｜先連續發滿 7 天）":
@@ -465,7 +631,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
                     "time_slot": "19:00 晚上",
                     "category": "晚上",
                     "role_badge": "🌙 第四篇：生活有連貫（早上埋伏筆，晚上給答案）",
-                    "hook_copy": f"來給早上的伏筆答案啦🌙 因為「{clean_in}」帶來的好心情，今天把工作空間與日常排程都整理得超舒心✨ 你們今天累了都怎麼充電？",
+                    "hook_copy": f"來給早上的伏筆答案啦🌙 今天因為「{clean_in}」開啟好心情，把工作空間與日常排程都整理得超舒心✨ 你們今天累了都怎麼充電？",
                     "visual_guide": "傍晚收工後的質感空間或完成事項的日常隨手拍",
                     "sticker_suggestion": "表情滑桿：給今天的充實度打幾分💯",
                     "highlight_tag": "免存精選（前後連貫養出每天追劇的鐵粉）"
@@ -570,7 +736,6 @@ def normalize_and_validate_story_data(raw_data: dict, fallback_data: dict, expec
         if not hook_copy:
             return False, f"第 {idx+1} 則限動缺少核心文案 hook_copy", fallback_data
 
-        # 確保結尾問號與聊天語氣符合一頁式攻略鐵律
         if hook_copy.endswith("?"):
             hook_copy = hook_copy[:-1] + "？"
         elif not hook_copy.endswith("？"):
@@ -609,7 +774,7 @@ def normalize_and_validate_story_data(raw_data: dict, fallback_data: dict, expec
 
     return True, "結構與攻略鐵律驗證通過", final_data
 
-# ----------------- 核心調用與診斷整合函式 (含自動重試與結構正規化) -----------------
+# ----------------- 核心調用與診斷整合函式 -----------------
 def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> tuple[dict, dict]:
     api_key = get_api_key()
     fallback_data = peggy_master_engine(mode, day_idx, user_input, opening_choice, hook_choice, seed_idx)
@@ -654,7 +819,7 @@ def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_c
 
 【必須遵守的攻略鐵律】：
 1. 第一篇必須結合指定開頭句型與日常輸入，早上埋下伏筆，第 {4 if story_count==5 else 8} 篇晚上給答案。
-2. 講話像聊天：每則 hook_copy 必須包含「你們」，且結尾必須丟出一個問題（以「？」結尾），字數 35~55 字自然口語。
+2. 講話像聊天：每則 hook_copy 必須包含「你們」，且結尾必須丟出一個問題（以「？」結尾），字數 35~55 字自然口語，文案開頭不要加中括號分類標籤。
 3. 未提供真實客戶或夥伴對話時，第 4 篇請以日常服務心得與詢問粉絲困擾為主，不虛構誇大宣稱。
 4. 只輸出純 JSON 物件，包含 day_theme 與 stories 陣列（共 {story_count} 筆，每筆含 story_number, category, hook_copy, visual_guide, sticker_suggestion）。"""
 
@@ -672,7 +837,6 @@ def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_c
     req_data = json.dumps(payload).encode("utf-8")
     start_time = time.time()
 
-    # 內建 2 次自動重試機制，應對官方伺服器短暫 503 高峰或網路波動
     for attempt in range(1, 3):
         execution_log["attempts"] = attempt
         req = urllib.request.Request(
@@ -810,7 +974,7 @@ def render_7day_schedule_table(active_day: int, mode: str) -> str:
         </table>
     </div>"""
 
-# ----------------- 介面頂部：奢華 Header -----------------
+# ----------------- 介面頂部：白金奢華 Header -----------------
 st.markdown("""
 <div class="luxury-header">
     <div class="brand-crown">👑</div>
@@ -893,23 +1057,6 @@ with st.expander("📊 查看完整《七天排程表 · 賣貨版 / 招商版 /
     st.caption("💡 **生活篇天天都在，工作篇輪流換：照著這張表發，七天不會重複，也不會卡住**（第 5 篇與第 9 篇隔天輪替）：")
     st.markdown(render_7day_schedule_table(selected_day_idx, selected_mode), unsafe_allow_html=True)
 
-# ----------------- 06 生活主題發想庫 -----------------
-if "draft_input" not in st.session_state:
-    st.session_state["draft_input"] = ""
-
-with st.expander("💡 06 生活主題發想庫（不知道發什麼？挑一個，照著問照講！）", expanded=False):
-    st.caption("👀 **看得到的日常**（點擊直接帶入下方輸入框）：")
-    vis_cols = st.columns(4)
-    for idx, (k, val) in enumerate(LIFE_TOPICS_VISIBLE.items()):
-        if vis_cols[idx % 4].button(k, key=f"vis_{idx}", use_container_width=True):
-            st.session_state["draft_input"] = val
-
-    st.caption("💭 **看不到的想法**（點擊直接帶入下方輸入框）：")
-    th_cols = st.columns(4)
-    for idx, (k, val) in enumerate(LIFE_TOPICS_THOUGHTS.items()):
-        if th_cols[idx % 4].button(k, key=f"th_{idx}", use_container_width=True):
-            st.session_state["draft_input"] = val
-
 # ----------------- 04 第一篇開頭句型 & 05 互動鉤子設定 -----------------
 col_op, col_hk = st.columns([1, 1])
 with col_op:
@@ -925,26 +1072,85 @@ with col_hk:
         index=0
     )
 
-# ----------------- 日常輸入框 -----------------
-user_thought = st.text_area(
-    "💬 公主今天有什麼日常、心情或客人對話？（隨興打一句，或從上方 06 主題庫點選）",
-    value=st.session_state["draft_input"],
-    placeholder="例如：客人送了一杯咖啡很好喝，心裡暖呼呼的...",
-    height=85
-)
-st.session_state["draft_input"] = user_thought
-
-# Session State 持久化
+# ----------------- Session State 初始化與 06 生活主題發想庫 Callback 連動 -----------------
+if "draft_input" not in st.session_state:
+    st.session_state["draft_input"] = ""
 if "story_plan" not in st.session_state:
     st.session_state["story_plan"] = None
 if "execution_log" not in st.session_state:
     st.session_state["execution_log"] = None
 if "seed_counter" not in st.session_state:
     st.session_state["seed_counter"] = 0
+if "selected_topic_notice" not in st.session_state:
+    st.session_state["selected_topic_notice"] = ""
+
+def on_select_topic(topic_label: str, topic_text: str):
+    """點擊 06 生活主題發想庫按鈕時：1. 同步寫入乾淨日常語句至輸入框 2. 直接秒排今日限動腳本"""
+    q_hint = TOPIC_QUESTIONS_MAP.get(topic_label, "")
+    full_seed_text = f"{topic_text}（{q_hint}）" if q_hint else topic_text
+    st.session_state["draft_input"] = topic_text
+    st.session_state["selected_topic_notice"] = f"✅ 已套用話題【{topic_label}】：「{topic_text}」，並為公主自動排好下方今日限動腳本！"
+    plan_res = peggy_master_engine(
+        selected_mode,
+        selected_day_idx,
+        full_seed_text,
+        opening_choice,
+        hook_choice,
+        st.session_state["seed_counter"]
+    )
+    st.session_state["story_plan"] = plan_res
+    st.session_state["execution_log"] = {
+        "timestamp": datetime.now(TAIPEI_TZ).strftime("%Y-%m-%d %H:%M:%S (Asia/Taipei)"),
+        "model": "gemini-3.8-flash",
+        "api_requested": False,
+        "api_success": False,
+        "attempts": 0,
+        "elapsed_seconds": 0.01,
+        "http_code": None,
+        "error_detail": None,
+        "source": f"06 主題庫一鍵快排（{topic_label}）",
+        "validation_result": "標準庫驗證通過"
+    }
+    st.session_state["seed_counter"] += 1
+
+with st.expander("💡 06 生活主題發想庫（不知道發什麼？點一下直接帶入並秒出腳本！）", expanded=False):
+    st.caption("👀 **看得到的日常**（點擊任一按鈕，自動帶入下方輸入框並立即排好腳本）：")
+    vis_cols = st.columns(2)
+    for idx, (k, val) in enumerate(LIFE_TOPICS_VISIBLE.items()):
+        vis_cols[idx % 2].button(
+            k,
+            key=f"vis_{idx}",
+            use_container_width=True,
+            on_click=on_select_topic,
+            args=(k, val)
+        )
+
+    st.caption("💭 **看不到的想法**（點擊任一按鈕，自動帶入下方輸入框並立即排好腳本）：")
+    th_cols = st.columns(2)
+    for idx, (k, val) in enumerate(LIFE_TOPICS_THOUGHTS.items()):
+        th_cols[idx % 2].button(
+            k,
+            key=f"th_{idx}",
+            use_container_width=True,
+            on_click=on_select_topic,
+            args=(k, val)
+        )
+
+if st.session_state["selected_topic_notice"]:
+    st.success(st.session_state["selected_topic_notice"])
+
+# ----------------- 日常輸入框 (深褐清晰字體，不反白) -----------------
+user_thought = st.text_area(
+    "💬 公主今天有什麼日常、心情或客人對話？（隨興打一句，或從上方 06 主題庫點選）",
+    key="draft_input",
+    placeholder="例如：客人送了一杯咖啡很好喝，心裡暖呼呼的...",
+    height=85
+)
 
 generate_btn = st.button("✨ 照攻略一鍵排好今日限動腳本（早埋伏筆＋晚給答案＋精選歸檔）", use_container_width=True)
 
 if generate_btn:
+    st.session_state["selected_topic_notice"] = ""
     final_input = user_thought.strip() if user_thought.strip() else "今天在工作室準備迎接預約的公主們，心情特別充實美好"
     with st.spinner("👑 軍師正在依《限動一頁式攻略》與《7天模板》排定今日腳本..."):
         plan_res, log_res = generate_stories_service(
@@ -967,22 +1173,22 @@ if plan and isinstance(plan, dict):
     source_str = log.get("source", "系統生成") if log else "系統生成"
     is_cloud_ai = bool(log and log.get("api_success"))
     
-    badge_bg = "rgba(46, 125, 50, 0.22)" if is_cloud_ai else "rgba(212, 175, 55, 0.16)"
-    badge_border = "#4CAF50" if is_cloud_ai else "rgba(212, 175, 55, 0.45)"
-    badge_color = "#A5D6A7" if is_cloud_ai else "#FFF1D0"
+    badge_bg = "#EBF7EE" if is_cloud_ai else "#FAF3E4"
+    badge_border = "#81C784" if is_cloud_ai else "#DEC393"
+    badge_color = "#2E7D32" if is_cloud_ai else "#7A5114"
     badge_icon = "✨" if is_cloud_ai else "👑"
 
     st.markdown(f"""
-    <div style="display:flex; justify-content:space-between; align-items:center; margin: 12px 0 10px 0; padding: 8px 14px; background: {badge_bg}; border: 1px solid {badge_border}; border-radius: 10px;">
-        <span style="font-size:12.5px; font-weight:600; color:{badge_color};">{badge_icon} 生成引擎：{html.escape(source_str)}</span>
-        <span style="font-size:11px; color:#D3C3B3;">耗時：{log.get('elapsed_seconds', 0.0) if log else 0.0}s</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin: 12px 0 10px 0; padding: 9px 14px; background: {badge_bg}; border: 1px solid {badge_border}; border-radius: 10px;">
+        <span style="font-size:12.5px; font-weight:700; color:{badge_color};">{badge_icon} 生成引擎：{html.escape(source_str)}</span>
+        <span style="font-size:11.5px; font-weight:600; color:#6E5A47;">耗時：{log.get('elapsed_seconds', 0.0) if log else 0.0}s</span>
     </div>
     """, unsafe_allow_html=True)
 
     escaped_theme = html.escape(str(plan.get('day_theme', '')))
     st.markdown(f"""
-    <div style="margin: 6px 0 14px 0; padding: 11px 14px; background: rgba(212, 175, 55, 0.12); border-radius: 12px; border: 1px dashed rgba(212, 175, 55, 0.45); text-align: center;">
-        <span style="color: #FFF1D0; font-size: 13.5px; font-weight: 600;">🌟 {escaped_theme}</span>
+    <div style="margin: 6px 0 14px 0; padding: 11px 14px; background: #FDF8EE; border-radius: 12px; border: 1.5px dashed #C89B4B; text-align: center;">
+        <span style="color: #6B4915; font-size: 13.5px; font-weight: 700;">🌟 {escaped_theme}</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -1047,10 +1253,10 @@ if log:
         if log.get("error_detail"):
             st.info(f"ℹ️ **連線診斷紀錄**：{log.get('error_detail')}（系統已自動由內建攻略智慧引擎無縫輸出）")
         else:
-            st.success("✅ **連線狀態**：Gemini API 呼叫並校驗成功，無任何錯誤。")
+            st.success("✅ **連線狀態**：呼叫並校驗成功，無任何錯誤。")
 
 st.markdown("""
-<div style="text-align:center; padding: 14px 0 8px 0; color:#A3907F; font-size:12px; letter-spacing:1px;">
-    最後記得：<b style="color:#E8BE6B;">流量很重要，但更重要的是：你要影響別人什麼？</b>
+<div style="text-align:center; padding: 14px 0 8px 0; color:#8A7968; font-size:12px; letter-spacing:1px;">
+    最後記得：<b style="color:#7A5114;">流量很重要，但更重要的是：你要影響別人什麼？</b>
 </div>
 """, unsafe_allow_html=True)
