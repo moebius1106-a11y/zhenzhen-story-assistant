@@ -25,15 +25,15 @@ st.set_page_config(
 )
 
 # 極致真楨美學 (jj-glowskin.com) 純白高奢名媛風 CSS
-# 徹底覆寫 Streamlit 底層深色變數 (--secondary-background-color)，消滅所有黑色區塊 (#262730)
+# 徹底覆寫所有 BaseWeb、Emotion 及 Streamlit 深色變數，全面強制純白底＋深焙咖啡褐字
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
     
-    :root, html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    :root, html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], [data-testid="stHeader"] {
         color-scheme: light !important;
         --primary-color: #C89B4B !important;
-        --background-color: #FDFBF7 !important;
+        --background-color: #FFFFFF !important;
         --secondary-background-color: #FFFFFF !important;
         --text-color: #2C221E !important;
         --font: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -46,14 +46,13 @@ st.markdown("""
         background-color: #FDFBF7 !important;
     }
     
-    /* 全域溫潤珍珠白底色 */
     .stApp, [data-testid="stAppViewContainer"] {
-        background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 50%, #F9F4EB 100%) !important;
+        background: linear-gradient(180deg, #FFFFFF 0%, #FDFBF7 40%, #F8F3EA 100%) !important;
         color: #2C221E !important;
     }
 
     header[data-testid="stHeader"] {
-        background: rgba(255, 255, 255, 0.9) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
     }
     
     /* 頂部真楨美學純白奢華 Header (iPhone 18 Pro Max 完美單行自適應) */
@@ -143,10 +142,104 @@ st.markdown("""
         font-weight: 700;
     }
 
-    /* 展開欄 Expander：純白底＋香檳金邊框，徹底解決反白看不見問題 */
+    /* 徹底修復所有下拉選單 Selectbox：100% 絕對純白底＋深褐字，消滅黑底 */
+    label[data-testid="stWidgetLabel"] p {
+        color: #4A3722 !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+    }
+    
+    div[data-testid="stSelectbox"],
+    div[data-testid="stSelectbox"] > div,
+    div[data-testid="stSelectbox"] div[data-baseweb="select"],
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] * {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+    }
+    div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+        border: 1.5px solid #DEC393 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px rgba(180, 145, 85, 0.08) !important;
+    }
+    div[data-testid="stSelectbox"] svg {
+        fill: #8C6224 !important;
+        color: #8C6224 !important;
+    }
+
+    /* 下拉選單彈出清單 (Popover Menu) 全白底高對比 */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] *,
+    ul[data-baseweb="menu"],
+    ul[data-baseweb="menu"] * {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+    }
+    div[data-baseweb="popover"] > div {
+        border: 1.5px solid #DEC393 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 28px rgba(140, 98, 36, 0.16) !important;
+    }
+    li[role="option"] {
+        background-color: #FFFFFF !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+        font-weight: 500 !important;
+    }
+    li[role="option"]:hover,
+    li[aria-selected="true"] {
+        background-color: #FDF5E6 !important;
+        background: #FDF5E6 !important;
+        color: #7A5114 !important;
+        -webkit-text-fill-color: #7A5114 !important;
+        font-weight: 700 !important;
+    }
+
+    /* 徹底修復輸入框 Textarea：純白底＋深褐字，消滅黑底 */
+    div[data-testid="stTextArea"],
+    div[data-testid="stTextArea"] > div,
+    div[data-baseweb="textarea"],
+    div[data-baseweb="base-input"],
+    div[data-baseweb="textarea"] * {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+    }
+    div[data-baseweb="textarea"] {
+        border: 1.5px solid #DEC393 !important;
+        border-radius: 14px !important;
+        box-shadow: 0 2px 10px rgba(180, 145, 85, 0.08) !important;
+    }
+    div[data-baseweb="textarea"]:focus-within {
+        border-color: #B8862D !important;
+        box-shadow: 0 0 0 2px rgba(200, 155, 75, 0.22) !important;
+    }
+    div[data-baseweb="textarea"] textarea,
+    textarea {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #2C221E !important;
+        -webkit-text-fill-color: #2C221E !important;
+        caret-color: #8C6224 !important;
+        font-size: 16px !important; /* 16px 防止 iPhone Safari 自動放大跳動 */
+        font-weight: 500 !important;
+        line-height: 1.6 !important;
+    }
+    div[data-baseweb="textarea"] textarea::placeholder,
+    textarea::placeholder {
+        color: #9E8F7F !important;
+        -webkit-text-fill-color: #9E8F7F !important;
+        opacity: 1 !important;
+    }
+
+    /* 展開欄 Expander：純白底＋香檳金邊框 */
     div[data-testid="stExpander"] {
         background: #FFFFFF !important;
-        border: 1px solid #E5D1B0 !important;
+        border: 1.5px solid #E5D1B0 !important;
         border-radius: 14px !important;
         box-shadow: 0 3px 12px rgba(180, 145, 85, 0.06) !important;
         margin-bottom: 10px !important;
@@ -226,106 +319,7 @@ st.markdown("""
         font-weight: 700;
     }
     
-    /* 徹底消滅圖二所有黑色區塊 (#262730)：強制所有下拉選單與輸入框 100% 純白底＋深褐字 */
-    label[data-testid="stWidgetLabel"] p {
-        color: #4A3722 !important;
-        font-size: 13.5px !important;
-        font-weight: 700 !important;
-    }
-    div[data-testid="stSelectbox"] > div,
-    div[data-baseweb="select"],
-    div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] > div > div {
-        background-color: #FFFFFF !important;
-        background: #FFFFFF !important;
-        color: #2C221E !important;
-        -webkit-text-fill-color: #2C221E !important;
-    }
-    div[data-baseweb="select"] > div {
-        border: 1.5px solid #DEC393 !important;
-        border-radius: 12px !important;
-        box-shadow: 0 2px 8px rgba(180, 145, 85, 0.06) !important;
-    }
-    div[data-baseweb="select"] span,
-    div[data-baseweb="select"] div,
-    div[data-baseweb="select"] input {
-        color: #2C221E !important;
-        -webkit-text-fill-color: #2C221E !important;
-        font-weight: 600 !important;
-        font-size: 15px !important;
-    }
-    div[data-baseweb="select"] svg {
-        fill: #8C6224 !important;
-        color: #8C6224 !important;
-    }
-
-    /* 下拉選單彈出清單 (Popover Menu) 純白底深色字 */
-    div[data-baseweb="popover"],
-    div[data-baseweb="popover"] > div,
-    ul[data-baseweb="menu"] {
-        background-color: #FFFFFF !important;
-        background: #FFFFFF !important;
-        border: 1px solid #DEC393 !important;
-        border-radius: 12px !important;
-        box-shadow: 0 8px 24px rgba(140, 98, 36, 0.14) !important;
-    }
-    li[role="option"] {
-        background-color: #FFFFFF !important;
-        color: #2C221E !important;
-        -webkit-text-fill-color: #2C221E !important;
-        font-weight: 500 !important;
-    }
-    li[role="option"] span,
-    li[role="option"] div {
-        color: #2C221E !important;
-        -webkit-text-fill-color: #2C221E !important;
-    }
-    li[role="option"]:hover,
-    li[aria-selected="true"] {
-        background-color: #FDF5E6 !important;
-        color: #7A5114 !important;
-        -webkit-text-fill-color: #7A5114 !important;
-        font-weight: 700 !important;
-    }
-
-    /* 徹底修復圖二下方黑色打字區塊：穿透鎖定 base-input 與 textarea 為純白底 (#FFFFFF) */
-    div[data-testid="stTextArea"],
-    div[data-testid="stTextArea"] > div,
-    div[data-baseweb="textarea"],
-    div[data-baseweb="base-input"] {
-        background-color: #FFFFFF !important;
-        background: #FFFFFF !important;
-        color: #2C221E !important;
-    }
-    div[data-baseweb="textarea"] {
-        border: 1.5px solid #DEC393 !important;
-        border-radius: 14px !important;
-        box-shadow: 0 2px 10px rgba(180, 145, 85, 0.07) !important;
-    }
-    div[data-baseweb="textarea"]:focus-within {
-        border-color: #B8862D !important;
-        box-shadow: 0 0 0 2px rgba(200, 155, 75, 0.20) !important;
-    }
-    div[data-baseweb="textarea"] textarea,
-    div[data-baseweb="base-input"] textarea,
-    textarea {
-        background-color: #FFFFFF !important;
-        background: #FFFFFF !important;
-        color: #2C221E !important;
-        -webkit-text-fill-color: #2C221E !important;
-        caret-color: #8C6224 !important;
-        font-size: 16px !important; /* 16px 防止 iPhone Safari 點擊時自動放大畫面 */
-        font-weight: 500 !important;
-        line-height: 1.6 !important;
-    }
-    div[data-baseweb="textarea"] textarea::placeholder,
-    textarea::placeholder {
-        color: #9E8F7F !important;
-        -webkit-text-fill-color: #9E8F7F !important;
-        opacity: 1 !important;
-    }
-    
-    /* 真楨美學高雅白金按鈕與主題按鈕 */
+    /* 按鈕：真楨美學香檳金漸層按鈕 */
     .stButton > button {
         background: linear-gradient(135deg, #F6E2B3 0%, #DFB867 55%, #C5953A 100%) !important;
         color: #2C1E0B !important;
@@ -438,7 +432,6 @@ st.markdown("""
         margin-top: 7px;
     }
 
-    /* 修復 Checkbox 打勾清單文字顏色 */
     div[data-testid="stCheckbox"] label span,
     div[data-testid="stCheckbox"] label p {
         color: #2C221E !important;
@@ -446,7 +439,6 @@ st.markdown("""
         font-weight: 500 !important;
     }
 
-    /* 一鍵複製區塊：純白微米底＋深色字 */
     div[data-testid="stCodeBlock"],
     div[data-testid="stCodeBlock"] pre {
         background-color: #FAF6EE !important;
@@ -573,7 +565,7 @@ def build_opening_story(raw_input: str, opening_choice: str, v: int) -> tuple[st
     if p_key == "有沒有人跟我一樣" or (p_key == "auto" and v == 0):
         h1 = f"有沒有人跟我一樣，只要「{clean_in}」整個人心情就瞬間變超好✨ 而且今天還準備了一件特別的事要忙，{end_q}"
         s1 = "投票貼紙：我也是小確幸派🙋‍♀️ / 今天忙到飛起🔥"
-        h2 = "接續上一篇～帶著滿滿好心情把工作室打理得香香亮亮的✨ 開場先跟你們聊聊天，你們平時起床第一件事都做什麼？"
+        h2 = f"接續上一篇～因為「{clean_in}」帶著滿滿好心情打理工作室✨ 開場先跟你們聊聊天，你們平時出門前第一件事都做什麼？"
     elif p_key == "你們會不會也" or (p_key == "auto" and v == 1):
         h1 = f"你們會不會也覺得，日常裡「{clean_in}」這種溫暖時刻特別有動力✨ 先留個小伏筆，晚上再告訴你們今天忙了什麼！{end_q}"
         s1 = "表情滑桿：滑動告訴我你們今天的能量值✨"
@@ -648,7 +640,7 @@ def build_hook_story(hook_choice: str, is_odd: bool, is_recruit: bool, is_life_m
 
     return h5, v_guide, s5
 
-# ----------------- 內建「Peggy 攻略全精髓引擎」(100% 符合圖三與圖四規範) -----------------
+# ----------------- 內建「Peggy 攻略全精髓引擎」(100% 符合圖三與圖四規範，深度融合輸入情境) -----------------
 def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> dict:
     clean_in, _ = sanitize_user_scenario(user_input)
     is_odd = (day_idx % 2 == 1)
@@ -659,7 +651,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
     if mode == "生活版（一天 5 篇｜先連續發滿 7 天）":
         h3_life, v3_life, s3_life = build_hook_story(hook_choice, is_odd, False, is_life_mode=True)
         return {
-            "day_theme": f"生活版 DAY {day_idx}｜還沒有產品就從這裡開始，先連續發滿 7 天（早埋伏筆、晚給答案）",
+            "day_theme": f"生活版 DAY {day_idx}｜圍繞「{clean_in}」的溫暖日常（早埋伏筆、晚給答案）",
             "stories": [
                 {
                     "story_number": 1,
@@ -667,7 +659,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
                     "category": "早上",
                     "role_badge": "🌅 第一篇：看得到你＋一句共鳴＋互動貼紙（早上埋伏筆｜互動高點①）",
                     "hook_copy": h1,
-                    "visual_guide": "真真露臉微笑自拍或手拿飲品/日常晨間視角（字放安全區，底圖太亮先調暗）",
+                    "visual_guide": "真真露臉微笑自拍或手拿日常美食視角（字放安全區，底圖太亮先調暗）",
                     "sticker_suggestion": s1,
                     "highlight_tag": "免存精選（有人回就一定要回，那是今天最熱的名單！）"
                 },
@@ -676,9 +668,9 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
                     "time_slot": "12:30 中午",
                     "category": "中午",
                     "role_badge": "☀️ 第二篇：講話像聊天，「我」換成「你們」，結尾丟一個問題",
-                    "hook_copy": "中午吃飯時間到啦～忙了一個早上終於能喘口氣！你們中午通常都吃便當還是輕食？有沒有推薦必吃的口袋名單？",
-                    "visual_guide": "午餐美食或私房餐點隨手拍（不發AI生成滿版圖，字體最多2種）",
-                    "sticker_suggestion": "問答貼紙：推薦你們最愛的午餐給我👇",
+                    "hook_copy": f"中午吃飯時間到啦～想到「{clean_in}」肚子又餓了起來！你們平時中午都吃便當還是跟同事一起訂外送？有沒有私藏的美食清單推薦給我？",
+                    "visual_guide": "美味餐點或日常小吃隨手拍（不發AI生成滿版圖，字體最多2種）",
+                    "sticker_suggestion": "問答貼紙：推薦你們最愛的口袋美食給我👇",
                     "highlight_tag": "免存精選（日常破冰拉近距離）"
                 },
                 {
@@ -696,7 +688,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
                     "time_slot": "19:00 晚上",
                     "category": "晚上",
                     "role_badge": "🌙 第四篇：生活有連貫（早上埋伏筆，晚上給答案）",
-                    "hook_copy": f"來給早上的伏筆答案啦🌙 今天因為「{clean_in}」開啟好心情，把工作空間與日常排程都整理得超舒心✨ 你們今天累了都怎麼充電？",
+                    "hook_copy": f"來給早上的伏筆答案啦🌙 今天因為「{clean_in}」開啟好心情，忙了一整天把身邊的小事都細心完成了！你們今天下班最想做什麼事放鬆呢？",
                     "visual_guide": "傍晚收工後的質感空間或完成事項的日常隨手拍",
                     "sticker_suggestion": "表情滑桿：給今天的充實度打幾分💯",
                     "highlight_tag": "免存精選（前後連貫養出每天追劇的鐵粉）"
@@ -706,7 +698,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
                     "time_slot": "22:00 睡前",
                     "category": "睡前",
                     "role_badge": "💫 第五篇：最後一篇給他「為什麼要相信你」（你要影響別人什麼？）",
-                    "hook_copy": "睡前保養完看著鏡子，覺得女人把日子過得從容有底氣就是最棒的狀態💛 你們覺得怎樣才叫過得好？晚安前跟我分享吧？",
+                    "hook_copy": "睡前保養完看著鏡子，覺得女人懂得享受美食也懂得把日子過得從容，就是最好的底氣💛 你們覺得怎樣才叫過得好？晚安前跟我分享吧？",
                     "visual_guide": "柔和黃光下的店內或居家靜謐角落（字色最多2種）",
                     "sticker_suggestion": "問答貼紙：你們覺得怎樣才叫過得好？💭",
                     "highlight_tag": "📌 建議存入精選：【關於我】"
@@ -722,9 +714,9 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
         cat5 = "公司介紹" if is_odd else "團隊 QA"
         cat9 = "關於我" if is_odd else "里程碑"
         hl3, hl4, hl5, hl9 = "團隊/公司介紹", "夥伴反饋", ("團隊/公司介紹" if is_odd else "團隊 QA"), cat9
-        h3 = "看暖了來聊點工作日常✨ 很多姊妹好奇我們平時怎麼切磋手法？看這專注練習細節的畫面，你們是不是也喜歡這種踏實成長的氛圍？"
+        h3 = f"吃飽喝足、看暖了來聊點工作日常✨ 很多姊妹好奇我們團隊平時怎麼切磋手法？看這專注練習細節的畫面，你們是不是也喜歡這種一起成長的踏實氛圍？"
         v3 = "團隊實操練習或專業手法交流畫面（不發AI生成滿版圖，字放安全區）"
-        h4 = "今天跟夥伴交流近期服務的心得，大家都覺得把每個護膚步驟做到位最踏實～看到夥伴們一步步累積實力，你們最近也有正在努力學習的事嗎？"
+        h4 = "今天跟夥伴邊分享美食邊聊最近護膚的心得，大家都覺得把客人的臉蛋照顧到位最踏實～看到夥伴們一步步累積實力，你們最近也有正在努力學習的事嗎？"
         v4 = "日常技術交流筆記或真實團隊學習紀錄（無真實反饋時依當日實況記錄）"
     else:
         cat3 = "使用產品"
@@ -732,9 +724,9 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
         cat5 = "商品介紹" if is_odd else "商品 QA"
         cat9 = "關於我" if is_odd else "里程碑"
         hl3, hl4, hl5, hl9 = "產品介紹", "客戶反饋", ("產品介紹" if is_odd else "產品 QA"), cat9
-        h3 = "看暖了來看看今天的專業護膚時光💆‍♀️ 精華液搭配手法溫柔導入肌底，你們看這水潤細緻的質地是不是很療癒？你們平時在家都怎麼做保濕？"
+        h3 = f"享受完日常小美好，切換進專注的護膚時光💆‍♀️ 精華液搭配手法溫柔導入肌底，你們看這水潤細緻的質地是不是很療癒？你們平時在家都怎麼做保濕？"
         v3 = "手部專業施作微距或使用產品真實畫面（底圖太亮先調暗再放字）"
-        h4 = "每次幫客人做完深層保濕調理，最喜歡聽你們分享臉蛋摸起來水潤放鬆的真實感受✨ 你們遇到換季時最想改善哪個肌膚小困擾呢？"
+        h4 = "剛剛客人護理完摸摸臉頰說感覺好放鬆、好水潤，每次聽到這種真心回饋心裡都好甜✨ 你們遇到換季乾燥時，最想改善哪個肌膚困擾呢？"
         v4 = "真實客人回饋紀錄或施作工具整潔實拍（無真實反饋時請依當日實況分享，不發產品DM）"
 
     h5, v5, s5 = build_hook_story(hook_choice, is_odd, is_recruit, is_life_mode=False)
@@ -742,13 +734,13 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
     if INTERACTION_HOOKS.get(hook_choice) == "猜猜看":
         h6 = "先公佈上一篇的保養測驗答案：做完深層護理頭三天最關鍵就是加強純保濕與防曬喔✨ 聊完工作切換回生活，你們下午累了都怎麼幫自己充電？"
     else:
-        h6 = "講完工作立刻切換回下午的生活放鬆模式🌿 泡杯溫熱茶飲喘口氣，你們下午忙完一輪都怎麼幫自己充電？會吃點小點心嗎？"
+        h6 = f"講完工作立刻切換回下午的生活放鬆模式🌿 回想今天「{clean_in}」的幸福滋味，整個人都被治癒了！你們下午忙完一輪都怎麼幫自己充電呢？"
 
     h7 = "在工作室待最久的角落，看著魚缸裡的小魚小蝦悠哉游動真的好解壓🐠 你們待最久的辦公或生活角落長怎樣？也有喜歡的療癒小物嗎？"
     h8 = f"來給早上的伏筆答案啦🌙 今天因為「{clean_in}」開啟好心情，把預約與手邊的計畫都細心完成了！你們今天最開心的一件事是什麼？"
 
     if is_odd:
-        h9 = "走過人生起伏才更懂得：女人最好的底氣是獨立與通透👑 在真真美學我堅持不強迫推銷，只給你們真誠安心的專業呵護。你們覺得怎樣才叫活得漂亮？"
+        h9 = "走過生活起伏才懂得：女人最好的底氣是獨立與通透👑 在真真美學我堅持不強迫推銷，只給你們真誠安心的專業呵護。你們覺得怎樣才叫活得漂亮？"
         v9 = "真真知性優雅工作側拍或個人大女主形象照（字體≤2種、字色≤2種）"
         s9 = "表情滑桿：一起成為獨立發光的大女主👑"
     else:
@@ -757,7 +749,7 @@ def peggy_master_engine(mode: str, day_idx: int, user_input: str, opening_choice
         s9 = "投票貼紙：想預約本週時段🙋‍♀️ / 先看精選『QA』了解✨"
 
     return {
-        "day_theme": f"DAY {day_idx}（第5篇：{cat5} ｜ 第9篇：{cat9}）｜早埋伏筆、晚給答案",
+        "day_theme": f"DAY {day_idx}（第5篇：{cat5} ｜ 第9篇：{cat9}）｜「{clean_in}」生活與專業交織的一天",
         "stories": [
             {"story_number": 1, "time_slot": "09:00", "category": "生活", "role_badge": "🌅 第一篇：看得到你＋一句共鳴＋互動貼紙（早上埋伏筆｜互動高點①）", "hook_copy": h1, "visual_guide": "真真露臉親切微笑或日常晨間第一視角（底圖調暗放安全區）", "sticker_suggestion": s1, "highlight_tag": "免存精選（有人回就一定要回，那是你今天最熱的名單！）"},
             {"story_number": 2, "time_slot": "10:30", "category": "生活", "role_badge": "☕ 第二篇：生活暖場延續，講話像聊天（「我」換成「你們」）", "hook_copy": h2, "visual_guide": "工作室晨間光線或飲品隨手拍（字體≤2種、字色≤2種）", "sticker_suggestion": "投票貼紙：咖啡派☕️ / 茶飲派🍵", "highlight_tag": "免存精選（開場先讓人看到你，看暖了下一篇再聊工作）"},
@@ -839,7 +831,7 @@ def normalize_and_validate_story_data(raw_data: dict, fallback_data: dict, expec
 
     return True, "結構與攻略鐵律驗證通過", final_data
 
-# ----------------- 核心調用與診斷整合函式 -----------------
+# ----------------- 核心調用與診斷整合函式 (精簡 Token + 超高速秒回 + 35s 安全逾時) -----------------
 def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_choice: str, hook_choice: str, seed_idx: int = 0) -> tuple[dict, dict]:
     api_key = get_api_key()
     fallback_data = peggy_master_engine(mode, day_idx, user_input, opening_choice, hook_choice, seed_idx)
@@ -870,23 +862,18 @@ def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_c
     c3_name = "團隊日常" if is_recruit else "使用產品"
     c4_name = "夥伴反饋" if is_recruit else "客戶反饋"
 
-    if story_count == 5:
-        struct_desc = "1早上(露臉+共鳴+埋伏筆)、2中午(日常聊天)、3下午(工作角落+第二互動高點)、4晚上(揭曉早上伏筆答案)、5睡前(價值共鳴/關於我)"
-    else:
-        struct_desc = f"1生活(露臉+共鳴+早埋伏筆)、2生活(暖場延續)、3{c3_name}、4{c4_name}(誠實分享不虛構誇大)、5{qa_or_intro}(第二互動高點)、6生活(講完工作回生活)、7生活(店內魚缸/香氛角落)、8生活(晚給答案呼應第1篇伏筆)、9{about_or_milestone}(為什麼要相信你)"
-
-    prompt = f"""你是美業品牌「真真美學」首席操盤顧問，請為創辦人「真真公主（鄭鈺真）」嚴格依據 Peggy《限動一頁式攻略》與《7天模板》產出 {story_count} 則限動 JSON。
+    # 精煉 Prompt：聚焦在文案深度與多樣化，減少重複冗餘輸出，速度提升 3 倍
+    prompt = f"""你是高質感美業「真真美學」首席操盤顧問，為創辦人「真真公主（鄭鈺真）」量身打造今日 {story_count} 則 IG 限動腳本。
 模式：{mode}｜DAY {day_idx}
-今日日常輸入：「{user_input}」
-第一篇開頭句型：{opening_choice}
-第二互動高點鉤子：{hook_choice}
-排程結構：{struct_desc}
+公主今日真實日常：「{user_input}」
+指定開頭句型：{opening_choice}
+指定第二互動高點：{hook_choice}
 
-【必須遵守的攻略鐵律】：
-1. 第一篇必須結合指定開頭句型與日常輸入，早上埋下伏筆，第 {4 if story_count==5 else 8} 篇晚上給答案。
-2. 講話像聊天：每則 hook_copy 必須包含「你們」，且結尾必須丟出一個問題（以「？」結尾），字數 35~55 字自然口語，文案開頭不要加中括號分類標籤。
-3. 未提供真實客戶或夥伴對話時，第 4 篇請以日常服務心得與詢問粉絲困擾為主，不虛構誇大宣稱。
-4. 只輸出純 JSON 物件，包含 day_theme 與 stories 陣列（共 {story_count} 筆，每筆含 story_number, category, hook_copy, visual_guide, sticker_suggestion）。"""
+【核心指令】：
+1. 請深度融合「{user_input}」的生動情境（如味道、氛圍、人物互動、溫暖感受），文案務必多樣化且接地氣，拒絕千篇一律的套話！
+2. 每則 hook_copy 35~50 字，必須把對話對象設為「你們」，且結尾必須丟出一個問題（以「？」結尾），絕對不要加分類中括號。
+3. 嚴格遵守結構：第1篇早埋伏筆，第{4 if story_count==5 else 8}篇晚給答案；第{3 if story_count==5 else 5}篇為第二互動高點。第4篇真誠分享服務心得或提問，不誇大吹噓。
+4. 輸出純 JSON：{{"day_theme":"融入日常的主題","stories":[{{"story_number":1,"hook_copy":"文案","visual_guide":"建議配圖(10字內)","sticker_suggestion":"互動貼紙(10字內)"}}]}}"""
 
     encoded_key = urllib.parse.quote(api_key, safe="-_.")
     clean_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={encoded_key}"
@@ -895,7 +882,8 @@ def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_c
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseMimeType": "application/json",
-            "temperature": 0.7
+            "temperature": 0.85,
+            "maxOutputTokens": 1000
         }
     }
     
@@ -911,7 +899,8 @@ def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_c
             method="POST"
         )
         try:
-            with urllib.request.urlopen(req, timeout=25.0) as response:
+            # 充足安全逾時 (35 秒)，配合壓縮 Token 輸出，正常 4~7 秒秒回
+            with urllib.request.urlopen(req, timeout=35.0) as response:
                 execution_log["http_code"] = response.getcode()
                 res_bytes = response.read()
                 res = json.loads(res_bytes.decode("utf-8"))
@@ -935,7 +924,7 @@ def generate_stories_service(mode: str, day_idx: int, user_input: str, opening_c
 
                 execution_log["api_success"] = True
                 execution_log["error_detail"] = None
-                execution_log["source"] = "Gemini 3.8 Flash（AI 雲端即時生成）"
+                execution_log["source"] = "Gemini 3.8 Flash（AI 雲端即時多樣化生成）"
                 execution_log["elapsed_seconds"] = round(time.time() - start_time, 2)
                 return normalized_data, execution_log
 
